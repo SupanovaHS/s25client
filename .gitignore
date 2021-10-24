@@ -18,3 +18,8 @@
 /external/boost*
 /win32/*.aps
 /data/RTTR/languages/*.mo
+/build
+/official release
+
+makeLineCount.ps1
+New Text Document.txt

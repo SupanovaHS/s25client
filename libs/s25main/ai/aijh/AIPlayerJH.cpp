@@ -1559,8 +1559,10 @@ void AIPlayerJH::CheckExpeditions()
 void AIPlayerJH::CheckForester()
 {
     const std::list<nobUsual*>& foresters = aii.GetBuildings(BuildingType::Forester);
+    const auto& woodcutters = aii.GetBuildings(BuildingType::Woodcutter);
     if(!foresters.empty() && foresters.size() < 2 && aii.GetMilitaryBuildings().size() < 3
-       && aii.GetBuildingSites().size() < 3)
+       && aii.GetBuildingSites().size() < 3
+       && !woodcutters.empty() && woodcutters.size() > 2) // check we have more than 2 woodcutters to cope with low starting resources and low tree density on map
     // stop the forester
     {
         if(!(*foresters.begin())->IsProductionDisabled())

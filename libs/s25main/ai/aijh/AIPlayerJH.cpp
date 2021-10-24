@@ -689,11 +689,9 @@ void AIPlayerJH::InitResourceMaps()
         resMap.init();
 }
 
-void AIPlayerJH::SetFarmedNodes(const MapPoint pt, bool set)
+void AIPlayerJH::SetFarmedNodes(const MapPoint pt, bool set, unsigned radius)
 {
     // Radius in dem Bauplatz für Felder blockiert wird
-    const unsigned radius = 3;
-
     aiMap[pt].farmed = set;
     std::vector<MapPoint> pts = gwb.GetPointsInRadius(pt, radius);
     for(const MapPoint& curPt : pts)
@@ -1142,6 +1140,8 @@ void AIPlayerJH::HandleBuilingDestroyed(MapPoint pt, BuildingType bld)
     {
         case BuildingType::Charburner:
         case BuildingType::Farm: SetFarmedNodes(pt, false); break;
+        case BuildingType::Charburner: SetFarmedNodes(pt, false ,3); break;
+        case BuildingType::Farm: SetFarmedNodes(pt, false,2); break;
         case BuildingType::HarborBuilding:
         {
             // destroy all other buildings around the harborspot in range 2 so we can rebuild the harbor ...
@@ -2091,11 +2091,11 @@ void AIPlayerJH::InitStoreAndMilitarylists()
 {
     for(const nobUsual* farm : aii.GetBuildings(BuildingType::Farm))
     {
-        SetFarmedNodes(farm->GetPos(), true);
+        SetFarmedNodes(farm->GetPos(), true,2);
     }
     for(const nobUsual* charburner : aii.GetBuildings(BuildingType::Charburner))
     {
-        SetFarmedNodes(charburner->GetPos(), true);
+        SetFarmedNodes(charburner->GetPos(), true,3);
     }
     // find the upgradebuilding
     UpdateUpgradeBuilding();

@@ -222,9 +222,13 @@ void BuildJob::BuildMainRoad()
 
     switch(type)
     {
-        case BuildingType::Forester: aijh.AddBuildJob(BuildingType::Woodcutter, target); break;
-        case BuildingType::Charburner:
-        case BuildingType::Farm: aijh.SetFarmedNodes(target, true); break;
+        case BuildingType::Forester:
+            aijh.AddBuildJob(BuildingType::Woodcutter, target);
+            aijh.AddBuildJob(BuildingType::Woodcutter, target);
+            break;
+        case BuildingType::Woodcutter: aijh.AddBuildJob(BuildingType::Forester, target); break;
+        case BuildingType::Charburner: aijh.SetFarmedNodes(target, true,3); break;
+        case BuildingType::Farm: aijh.SetFarmedNodes(target, true,2); break;
         case BuildingType::Mill: aijh.AddBuildJob(BuildingType::Bakery, target); break;
         case BuildingType::PigFarm: aijh.AddBuildJob(BuildingType::Slaughterhouse, target); break;
         case BuildingType::Bakery:

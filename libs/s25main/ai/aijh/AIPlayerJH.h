@@ -192,7 +192,7 @@ public:
     /// upgrade building (order new private, kick out general)
     void MilUpgradeOptim();
 
-    void SetFarmedNodes(MapPoint pt, bool set);
+    void SetFarmedNodes(MapPoint pt, bool set,unsigned radius);
     // removes a no longer used road(and its flags) returns true when there is a building at the flag that might need a
     // new connection
     bool RemoveUnusedRoad(const noFlag& startFlag, helpers::OptionalEnum<Direction> excludeDir, bool firstflag = true,

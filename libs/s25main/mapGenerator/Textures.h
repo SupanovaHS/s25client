@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "RandomUtility.h"
 #include "helpers/containerUtils.h"
 #include "mapGenerator/Algorithms.h"
 #include "mapGenerator/NodeMapUtilities.h"
@@ -173,8 +174,8 @@ namespace rttr { namespace mapGenerator {
          *
          * @param mountainLevel minimum height mountains start from
          */
+        void ApplyTexturingByHeightMap(unsigned mountainLevel, RandomUtility& rnd);
         void ApplyTexturingByHeightMap(unsigned mountainLevel);
-
         /**
          * Sets textures near the specified coast to ensure a smooth looking transition from water to buildable land.
          *
@@ -210,6 +211,7 @@ namespace rttr { namespace mapGenerator {
          * @param mountainLevel minimum z-value defining the starting height for mountains
          * @param coastline size of the coastline
          */
+        void AddTextures(unsigned mountainLevel, unsigned coastline, RandomUtility& rnd);
         void AddTextures(unsigned mountainLevel, unsigned coastline);
     };
 

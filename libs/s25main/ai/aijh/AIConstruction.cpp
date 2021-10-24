@@ -46,6 +46,7 @@ void AIConstruction::AddBuildJob(std::unique_ptr<BuildJob> job, bool front)
 {
     if(job->GetType() == BuildingType::Shipyard && aijh.IsInvalidShipyardPosition(job->GetAround()))
         return;
+
     if(BuildingProperties::IsMilitary(
          job->GetType())) // non military buildings can only be added once to the contruction que for every location
     {

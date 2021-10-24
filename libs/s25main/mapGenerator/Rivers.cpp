@@ -33,7 +33,22 @@ namespace rttr { namespace mapGenerator {
                 const auto& edges = GetTriangleEdges(triangle, size);
                 for(const MapPoint& edge : edges)
                 {
-                    river.insert(edge);
+
+                    if(rnd.ByChance(40)) // 40 % river edge becomes river too (space for fish)
+                    {
+                        const auto& edgetriangles = GetTriangles(edge, size, currentDir);
+                        for(const auto it : edgetriangles)
+                        {
+                            textures.Set(it, water);
+                            const auto& edges1 = GetTriangleEdges(it, size);
+                            for(const MapPoint& edge1 : edges1)
+                            {
+                                river.insert(edge1);
+                            }
+                        }
+                    }
+                    else
+                        river.insert(edge);
                 }
             }
 

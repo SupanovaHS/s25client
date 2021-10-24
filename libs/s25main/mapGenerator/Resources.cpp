@@ -66,7 +66,7 @@ namespace rttr { namespace mapGenerator {
             {
                 auto suroundingArea = map.getTextures().GetPointsInRadiusWithCenter(pt, 5);
                 excludedArea.insert(suroundingArea.begin(), suroundingArea.end());
-            } else if(map.textureMap.Any(pt, IsSnowOrLava))
+            } else if(map.textureMap.Any(pt, IsMountainOrSnowOrLava))
             {
                 excludedArea.insert(pt);
             }
@@ -142,21 +142,46 @@ namespace rttr { namespace mapGenerator {
 
         RTTR_FOREACH_PT(MapPoint, map.size)
         {
+            // now we place clumps, iterating EVERY point makes the probability settings smash objects in all over
+            // need to reduce the amount of points evaluated, based on the probability settings provided....
+            
             const bool canPlaceStonePile = waterDistance[pt] > 0 && distanceToExcludedArea[pt] > 0;
             if(canPlaceStonePile && rnd.ByChance(settings.stonePiles))
             {
-                map.objectTypes[pt] = rnd.ByChance(50) ? 0xCC : 0xCD;
-                map.objectInfos[pt] = rnd.RandomValue(1, 6);
-                continue;
+
+                const auto& stonearea = map.resources.GetPointsInRadiusWithCenter(pt, rnd.RandomValue(1, 4));
+               
+                for(const auto& it : stonearea)
+                {
+                    const bool canPlaceStoneClump = waterDistance[it] > 0 && distanceToExcludedArea[it] > 0;
+                    if(canPlaceStoneClump && rnd.ByChance(settings.stonePiles /4))
+                    {
+                        map.objectTypes[it] = rnd.ByChance(50) ? libsiedler2::OT_Stone1 : libsiedler2::OT_Stone2;
+                        map.objectInfos[it] = rnd.RandomValue(1, 6);
+                    }
+                }
+
+                continue; // no place tree
             }
 
             const auto treeProb = probabilities[pt];
             if(treeProb > 0 && rnd.ByChance(treeProb))
             {
-                auto tree = treeForPoint(pt);
 
-                map.objectTypes[pt] = tree.type;
-                map.objectInfos[pt] = tree.index + rnd.RandomValue(0, 7);
+                const auto& treearea = map.resources.GetPointsInRadiusWithCenter(pt, rnd.RandomValue(1,4));
+                for(const auto& it : treearea)
+                {
+                    if(rnd.ByChance(treeProb / 4))
+                    {
+                        if(map.objectTypes[it] == libsiedler2::OT_Empty && textureMap.Any(it, IsBuildableLand)) // check we empty
+                        {
+                            auto tree = treeForPoint(it);
+
+                            map.objectTypes[it] = tree.type;
+                            map.objectInfos[it] = tree.index + rnd.RandomValue(0, 7);
+                        }
+                    }
+                }             
             }
         }
     }
@@ -200,6 +225,7 @@ namespace rttr { namespace mapGenerator {
         {
             if(textures.All(pt, IsMinableMountain))
             {
+      
                 // No mineable resources wanted.
                 if(total == 0)
                     continue;
@@ -231,7 +257,7 @@ namespace rttr { namespace mapGenerator {
                         if(!resources[pt_d] && textures.All(pt_d, IsMinableMountain))
                         {
                             --mRI.budget;
-                            resources[pt_d] = mRI.resource + rnd.RandomValue(1, 8);
+                            resources[pt_d] = mRI.resource + rnd.RandomValue(1, 15);
                         }
                     }
                 }
@@ -253,7 +279,7 @@ namespace rttr { namespace mapGenerator {
         const auto& textures = map.textureMap;
         RTTR_FOREACH_PT(MapPoint, map.size)
         {
-            if(rnd.ByChance(3))
+            if(rnd.ByChance(1))
             {
                 if(textures.All(pt, IsWater))
                 {

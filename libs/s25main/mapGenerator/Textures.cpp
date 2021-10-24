@@ -57,7 +57,25 @@ namespace rttr { namespace mapGenerator {
         auto landTextures = textureMap_.FindAll(IsBuildableLand);
         textureMap_.Sort(landTextures, ByHumidity);
         auto mountainTextures = textureMap_.FindAll(IsMinableMountain);
-        mountainTextures.push_back(textureMap_.Find(IsSnowOrLava));
+        mountainTextures.push_back(textureMap_.Find(IsBuildableLand));
+        // land size 6
+        //mnt size 5
+
+        auto mnt = mountainTextures.begin();
+        std::advance(mnt, 1);
+        mountainTextures.insert(mnt, textureMap_.Find(IsBuildableLand));
+
+        mnt = mountainTextures.begin();
+        std::advance(mnt, 2);
+        mountainTextures.insert(mnt, textureMap_.Find(IsBuildableLand));
+
+         auto land = landTextures.begin();
+        std::advance(land, 2);
+         landTextures.insert(land, textureMap_.Find(IsMinableMountain));
+
+         land = landTextures.begin();
+         std::advance(land, 3);
+         landTextures.insert(land, textureMap_.Find(IsMinableMountain));
 
         for(uint8_t z = 0; z <= maximum; z++)
         {
@@ -78,6 +96,34 @@ namespace rttr { namespace mapGenerator {
         return mapping;
     }
 
+    void Texturizer::ApplyTexturingByHeightMap(unsigned mountainLevel, RandomUtility& rnd_)
+    {
+        const auto& mapping = CreateTextureMapping(mountainLevel);
+        const MapExtent size = z_.GetSize();
+        const auto& z = z_;
+
+        auto interpolateEdges = [&size, z](const Triangle& triangle) {
+            const auto& edges = GetTriangleEdges(triangle, size);
+
+            // Assumptions:
+            // 1) sum of 3 height values is always < 256 (1 byte)
+            // 2) we always want to round to the next integer (ceil)
+            return static_cast<uint8_t>(std::ceil(static_cast<double>(z[edges[0]] + z[edges[1]] + z[edges[2]]) / 3));
+        };
+
+        RTTR_FOREACH_PT(MapPoint, size)
+        {
+            if(textures_[pt].rsu.value == DescIdx<TerrainDesc>::INVALID)
+            {
+                textures_[pt].rsu = mapping[interpolateEdges(Triangle(true, pt))];
+            }
+            if(textures_[pt].lsd.value == DescIdx<TerrainDesc>::INVALID)
+            {
+                textures_[pt].lsd = mapping[interpolateEdges(Triangle(false, pt))];
+            }
+        }
+    }
+
     void Texturizer::ApplyTexturingByHeightMap(unsigned mountainLevel)
     {
         const auto& mapping = CreateTextureMapping(mountainLevel);
@@ -92,6 +138,7 @@ namespace rttr { namespace mapGenerator {
             // 2) we always want to round to the next integer (ceil)
             return static_cast<uint8_t>(std::ceil(static_cast<double>(z[edges[0]] + z[edges[1]] + z[edges[2]]) / 3));
         };
+
 
         RTTR_FOREACH_PT(MapPoint, size)
         {
@@ -159,10 +206,85 @@ namespace rttr { namespace mapGenerator {
         std::set<MapPoint, MapPointLess> nodes;
         nodes.insert(transitions.begin(), transitions.end());
         const auto water = textureMap_.Find(IsWater);
-        const auto boulder = textureMap_.Find(IsBuildableMountain);
-        const auto swamp = textureMap_.Find(IsSwamp);
+        const auto boulder = textureMap_.Find(IsBuildableLand);
+        const auto swamp = textureMap_.Find(IsBuildableMountain);
         ReplaceTextures(textures_, 0, nodes, swamp, {water});
-        ReplaceTextures(textures_, 1, nodes, boulder, {swamp, water});
+        ReplaceTextures(textures_, 5, nodes, boulder, {swamp, water});
+    }
+
+    void Texturizer::AddTextures(unsigned mountainLevel, unsigned coastline, RandomUtility& rnd_)
+    {
+        ApplyTexturingByHeightMap(mountainLevel,rnd_);
+
+
+        // lakes
+        auto& textures = textureMap_;
+        const auto water = textures.Find(IsWater);
+
+        RTTR_FOREACH_PT(MapPoint, textures_.GetSize())
+        {
+            if(textureMap_.All(pt, IsBuildableLand))
+            {
+                if(rnd_.ByChance(1)) // 1% chance
+                {
+                    if(rnd_.ByChance(
+                         5)) // 5% chance yes twice coz 1% is a VERY high chance considering the amount of nodes
+                    {
+                        auto lakeSize = rnd_.RandomValue(1, 5);
+
+                        for(int xd = (-1) * lakeSize; xd <= lakeSize; ++xd)
+                        {
+                            for(int yd = (-1) * lakeSize; yd <= lakeSize; ++yd)
+                            {
+                                // const MapPoint pt_d = resources.MakeMapPoint(pt + Position(xd, yd));
+                                //
+                                const MapPoint pt_d = textures_.MakeMapPoint(pt + Position(xd, yd));
+
+                                const auto& triangles = GetTriangles(pt_d, textures_.GetSize(), Direction::East);
+
+                                for(const auto& triangle : triangles)
+                                {
+                                    textures.Set(triangle, water);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /*auto coast = SelectPoints(
+          [this](const MapPoint& pt) {
+              return this->textureMap_.Any(pt, IsLand) && this->textureMap_.Any(pt, IsWater);
+          },
+          this->textures_.GetSize());
+
+        ApplyCoastTexturing(coast, 1); // small for tiny rivers
+
+        auto isRiver = [this](const MapPoint& pt) {
+            auto suroundedByWater = [this](const MapPoint& pt) { return this->textureMap_.All(pt, IsWater); };
+            return !helpers::contains_if(this->textures_.GetNeighbours(pt), suroundedByWater);
+        };
+        helpers::erase_if(coast, isRiver);
+
+        ApplyCoastTexturing(coast, 1);*/
+
+        const auto moutainWaterTransition = SelectPoints(
+          [this](const MapPoint& pt) {
+              return this->textureMap_.Any(pt, IsMinableMountain) && this->textureMap_.Any(pt, IsWater);
+          },
+          this->textures_.GetSize());
+
+        ApplyMountainWaterTransitions(moutainWaterTransition);
+
+        const auto mountainFoot = SelectPoints(
+          [this](const MapPoint& pt) {
+              return this->textureMap_.Any(pt, IsMinableMountain) && !this->textureMap_.All(pt, IsMountainOrSnowOrLava);
+          },
+          this->textures_.GetSize());
+
+        ApplyMountainTransitions(mountainFoot);
     }
 
     void Texturizer::AddTextures(unsigned mountainLevel, unsigned coastline)
@@ -185,14 +307,6 @@ namespace rttr { namespace mapGenerator {
 
         ApplyCoastTexturing(coast, coastline);
 
-        const auto mountainFoot = SelectPoints(
-          [this](const MapPoint& pt) {
-              return this->textureMap_.Any(pt, IsMinableMountain) && !this->textureMap_.All(pt, IsMountainOrSnowOrLava);
-          },
-          this->textures_.GetSize());
-
-        ApplyMountainTransitions(mountainFoot);
-
         const auto moutainWaterTransition = SelectPoints(
           [this](const MapPoint& pt) {
               return this->textureMap_.Any(pt, IsMinableMountain) && this->textureMap_.Any(pt, IsWater);
@@ -200,6 +314,14 @@ namespace rttr { namespace mapGenerator {
           this->textures_.GetSize());
 
         ApplyMountainWaterTransitions(moutainWaterTransition);
+
+        const auto mountainFoot = SelectPoints(
+          [this](const MapPoint& pt) {
+              return this->textureMap_.Any(pt, IsMinableMountain) && !this->textureMap_.All(pt, IsMountainOrSnowOrLava);
+          },
+          this->textures_.GetSize());
+
+        ApplyMountainTransitions(mountainFoot);
     }
 
     void ReplaceTextureForPoint(NodeMapBase<TexturePair>& textures, const MapPoint& point, DescIdx<TerrainDesc> texture,

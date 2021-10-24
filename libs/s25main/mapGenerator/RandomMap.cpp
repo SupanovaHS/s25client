@@ -181,7 +181,7 @@ namespace rttr { namespace mapGenerator {
 
     void RandomMap::CreateMixedMap()
     {
-        const auto center = rnd_.Point(map_.size);
+        const auto center = MapPoint(map_.size.x / 2, map_.size.y / 2);
         const unsigned maxDistance = map_.z.CalcMaxDistance();
 
         Restructure(map_, [this, &center, maxDistance](const MapPoint& pt) {
@@ -203,9 +203,9 @@ namespace rttr { namespace mapGenerator {
 
         CreateFreeIslands(waterNodes);
 
-        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size));
+        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size),rnd_);
 
-        PlaceHarbors(map_, rivers);
+        //PlaceHarbors(map_, rivers);
         PlaceHeadquarters(map_, rnd_, map_.players, settings_.mountainDistance);
     }
 
@@ -247,7 +247,7 @@ namespace rttr { namespace mapGenerator {
 
         const auto rivers = CreateRivers(center);
 
-        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size));
+        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size),rnd_);
 
         PlaceHarbors(map_, rivers);
 
@@ -271,7 +271,7 @@ namespace rttr { namespace mapGenerator {
         const auto mountainLevel = LimitFor(map_.z, land, static_cast<uint8_t>(1)) + 1;
         CreateRivers();
 
-        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size));
+        texturizer_.AddTextures(mountainLevel, GetCoastline(map_.size),rnd_);
 
         PlaceHeadquarters(map_, rnd_, map_.players, settings_.mountainDistance);
     }

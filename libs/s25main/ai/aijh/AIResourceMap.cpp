@@ -84,20 +84,25 @@ MapPoint AIResourceMap::findBestPosition(const MapPoint& pt, BuildingQuality siz
         const unsigned idx = map.GetIdx(curPt);
         if(map[idx] > best_value)
         {
-            if(!aiMap[idx].reachable || !aiMap[idx].owned || aiMap[idx].farmed)
-                continue;
-            RTTR_Assert(aii.GetBuildingQuality(curPt)
-                        == aiMap[curPt].bq); // Temporary, to check if aiMap is correctly update, see below
-            if(!canUseBq(aii.GetBuildingQuality(curPt), size)) // map[idx].bq; TODO: Update nodes BQ and use that
-                continue;
-            // special case fish -> check for other fishery buildings
-            if(res == AIResource::Fish && aii.isBuildingNearby(BuildingType::Fishery, curPt, 5))
-                continue;
-            if(res == AIResource::Borderland && aii.gwb.IsOnRoad(aii.gwb.GetNeighbour(curPt, Direction::SouthEast)))
-                continue;
-            // dont build next to empty harborspots
-            if(aii.isHarborPosClose(curPt, 2, true))
-                continue;
+            if(res == AIResource::Fish) // fish ignore building site checks since it needs to find land to build on near by, this only returns water which cant be built on
+            {
+                // check fishery near by
+                if(aii.isBuildingNearby(BuildingType::Fishery, curPt, 10))
+                    continue;
+            } else
+            {
+                if(!aiMap[idx].reachable || !aiMap[idx].owned || aiMap[idx].farmed)
+                    continue;
+                RTTR_Assert(aii.GetBuildingQuality(curPt)
+                            == aiMap[curPt].bq); // Temporary, to check if aiMap is correctly update, see below
+                if(!canUseBq(aii.GetBuildingQuality(curPt), size)) // map[idx].bq; TODO: Update nodes BQ and use that
+                    continue;
+                if(res == AIResource::Borderland && aii.gwb.IsOnRoad(aii.gwb.GetNeighbour(curPt, Direction::SouthEast)))
+                    continue;
+                // dont build next to empty harborspots
+                if(aii.isHarborPosClose(curPt, 2, true))
+                    continue;
+            }
             best = curPt;
             best_value = map[idx];
             // TODO: calculate "perfect" rating and instantly return if we got that already

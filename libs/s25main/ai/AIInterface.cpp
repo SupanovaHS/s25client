@@ -87,7 +87,7 @@ AISubSurfaceResource AIInterface::GetSubsurfaceResource(const MapPoint pt) const
         case ResourceType::Granite: return AISubSurfaceResource::Granite;
         case ResourceType::Fish: return AISubSurfaceResource::Fish;
         case ResourceType::Nothing:
-        case ResourceType::Water: break;
+            default : break;
     }
     return AISubSurfaceResource::Nothing;
 }
@@ -132,6 +132,8 @@ int AIInterface::GetResourceRating(const MapPoint pt, AIResource res) const
         case AIResource::Stones:
             if(GetSurfaceResource(pt) == AISurfaceResource::Stones)
                 return RES_RADIUS[res];
+            if(IsBuildingOnNode(pt, BuildingType::Quarry)) //penalize quarry already here
+                return -40;
             break;
         case AIResource::Plantspace:
             if(GetSurfaceResource(pt) == AISurfaceResource::Nothing

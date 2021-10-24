@@ -1017,7 +1017,7 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
         case BuildingType::Guardhouse:
         case BuildingType::Watchtower:
         case BuildingType::Fortress:
-            foundPos = FindBestPosition(around, AIResource::Borderland, BUILDING_SIZE[type], searchRadius);
+            foundPos = FindBestPosition(around, AIResource::Borderland, BUILDING_SIZE[type], searchRadius * 2);
             break;
         case BuildingType::GoldMine:
             foundPos = FindBestPosition(around, AIResource::Gold, BuildingQuality::Mine, searchRadius);

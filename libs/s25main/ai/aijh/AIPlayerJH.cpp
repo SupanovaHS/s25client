@@ -988,7 +988,10 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
             // ensure some distance to other foresters and an minimal amount of plantspace
             if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester)
                && GetDensity(around, AIResource::Plantspace, 7) > 15)
-                foundPos = FindBestPosition(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, 0);
+                // now make sure we not near a farm....
+                if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Farm) // not near farms or charburners plz
+                   && !construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Charburner))
+                    foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 0);
             break;
         case BuildingType::Hunter:
         {

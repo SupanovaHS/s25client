@@ -18,25 +18,25 @@ public:
     /// Was der gerade so schönes macht
     enum class State : uint8_t
     {
-        FigureWork,                         /// Arbeiten der noFigure (Laufen zum Arbeitsplatz, Rumirren usw)
-        EnterBuilding,                      /// Betreten des Gebäudes
-        Waiting1,                           /// Warten, bis man anfängt zu produzieren
-        Waiting2,                           /// Warten nach dem Produzieren, bis man Ware rausträgt (nur Handwerker)
-        CarryoutWare,                       /// Raustragen der Ware
-        Work,                               /// Arbeiten
-        WaitingForWaresOrProductionStopped, /// Warten auf Waren oder weil Produktion eingetellt wurde
-        WalkToWorkpoint,                    /// Zum "Arbeitspunkt" laufen (nur Landarbeiter)
-        WalkingHome,                        /// vom Arbeitspunkt zurück nach Hause laufen (nur Landarbeiter)
-        WaitForWareSpace,                   /// auf einen freien Platz an der Flagge vor dem Gebäude warten
-        HunterChasing,                      /// Jäger: verfolgt das Tier bis auf eine gewisse Distanz
-        HunterFindingShootingpoint,  /// Jäger: sucht einen Punkt rund um das Tier, von dem er es abschießen kann
-        HunterShooting,              /// Jäger: Tier erschießen
-        HunterWalkingToCadaver,      /// Jäger: Zum Kadaver laufen
-        HunterEviscerating,          /// Jäger: Tier ausnehmen
-        CatapultTargetBuilding,      /// Katapult: Dreht den Katapult oben auf das Ziel zu und schießt
-        CatapultBackoff,             /// Katapult: beendet schießen und dreht Katapult in die Ausgangsstellung zurück
+        FigureWork,                         /// Work of the noFigure (running to work, wandering around, etc.)
+        EnterBuilding,                      /// Entering the building
+        Waiting1,                           /// Waiting until you start producing
+        Waiting2,                           /// Waiting after producing until goods are taken out (craftsmen only)
+        CarryoutWare,                       /// Carrying out the goods
+        Work,                               /// work
+        WaitingForWaresOrProductionStopped, /// Waiting for goods or because production was stopped
+        WalkToWorkpoint,                    /// Walk to "work point" (farm workers only)
+        WalkingHome,                        /// walk back home from the work point (farm workers only)
+        WaitForWareSpace,                   /// wait for a free space on the flag in front of the building
+        HunterChasing,                      /// Hunter: pursues the animal up to a certain distance
+        HunterFindingShootingpoint,  /// Hunter: searches for a point around the animal from which he can shoot it
+        HunterShooting,              /// Jäger: Shoot an animal
+        HunterWalkingToCadaver,      /// Hunter: Run to the carcass
+        HunterEviscerating,          /// Hunter: eviscerate animal
+        CatapultTargetBuilding,      /// Catapult: Turns the catapult up towards the target and shoots
+        CatapultBackoff,             /// Katapult: stop shooting and turn the catapult back to its starting position
         HunterWaitingForAnimalReady, /// Hunter: Arrived at shooting pos and waiting for animal to be ready to
-                                     /// be shot
+
     };
     friend constexpr auto maxEnumValue(State) { return State::HunterWaitingForAnimalReady; }
 

@@ -87,7 +87,7 @@ void SoundManager::playAnimalSound(unsigned soundLstId)
     if(numPlayedCt >= maxPlayCtPerSound)
         return;
 
-    const unsigned volume = helpers::randomValue(getSoundRng(), 50u, 70u);
+    const unsigned volume = helpers::randomValue(getSoundRng(), 5u, 20u);
     EffectPlayId playId = LOADER.GetSoundN("sound", soundLstId)->Play(volume, false);
 
     if(playId != EffectPlayId::Invalid)
@@ -114,7 +114,7 @@ void SoundManager::playBirdSounds(const unsigned treeCount)
         if(treeCount > 0)
         {
             const unsigned soundIdx = helpers::randomValue(getSoundRng(), 87u, 91u);
-            const unsigned volume = helpers::randomValue(getSoundRng(), 50u, 70u);
+            const unsigned volume = helpers::randomValue(getSoundRng(), 5u, 20u);
             birdPlayId = LOADER.GetSoundN("sound", soundIdx)->Play(volume, false);
         }
         minNextBirdSound = now + milliseconds(helpers::randomValue(getSoundRng(), 150u, 1000u));
@@ -131,7 +131,7 @@ void SoundManager::playOceanBrawling(const unsigned waterPercent)
     // Play ocean sound for at least 10% water
     if(waterPercent >= 10)
     {
-        const unsigned volume = waterPercent * 2u + 55u;
+        const unsigned volume = waterPercent * 2u + 20u;
         if(!AUDIODRIVER.IsEffectPlaying(oceanPlayId))
         {
             // SDL Mixer may wrongly return that the sound is not playing, so make sure the old effect is stopped.

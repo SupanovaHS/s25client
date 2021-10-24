@@ -124,6 +124,8 @@ public:
     void InitStoreAndMilitarylists();
     // set default start values for the ai for distribution
     void InitDistribution();
+    //set buildorders
+    void InitBuildOrders();
     // returns true if we can get to the startflag in <maxlen without turning back
     bool IsFlagPartofCircle(const noFlag& startFlag, unsigned maxlen, const noFlag& curFlag,
                             helpers::OptionalEnum<Direction> excludeDir, std::vector<const noFlag*> oldFlags);

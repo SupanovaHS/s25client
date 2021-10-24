@@ -322,6 +322,7 @@ void AIPlayerJH::RunGF(const unsigned gf, bool gfisnwf)
     if((gf + playerId * 7) % build_interval == 0) // plan new buildings
     {
         CheckForUnconnectedBuildingSites();
+        CheckForUnconnectedBuildings();
         PlanNewBuildings(gf);
     }
 }

@@ -89,14 +89,18 @@ public:
 
     GameWorld& GetGameWorld() { return world; }
     const GameWorld& GetGameWorld() const { return world; }
-
+ 
     const MapPoint& GetHQPos() const { return hqPos; }
     void AddBuilding(noBuilding* bld, BuildingType bldType);
     void RemoveBuilding(noBuilding* bld, BuildingType bldType);
     void AddBuildingSite(noBuildingSite* bldSite);
+    void MoveBuildingSiteFront(noBuildingSite* bldSite);
+    void MoveBuildingSiteUp(noBuildingSite* bldSite);
+    void MoveBuildingSiteDown(noBuildingSite* bldSite);
+    void MoveBuildingSiteBottom(noBuildingSite* bldSite);
     void RemoveBuildingSite(noBuildingSite* bldSite);
     const BuildingRegister& GetBuildingRegister() const { return buildings; }
-
+    BuildingRegister* GetBuildingRegisterptr() { return &buildings; }
     /// Notify that a new road connection exists (not only an existing road splitted)
     void NewRoadConnection(RoadSegment* rs);
     /// Neue Straße hinzufügen
@@ -337,9 +341,10 @@ public:
 private:
     /// Access to the world
     GameWorld& world;
+
     /// List of all buildings
     BuildingRegister buildings; //-V730_NOINIT
-
+    //
     /// Lister aller Straßen von dem Spieler
     std::list<RoadSegment*> roads;
 

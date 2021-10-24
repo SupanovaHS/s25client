@@ -61,6 +61,12 @@ void BuildingRegister::Add(noBuildingSite* building_site)
     building_sites.push_back(building_site);
 }
 
+void BuildingRegister::Addfront(noBuildingSite* building_site)
+{
+    RTTR_Assert(!helpers::contains(building_sites, building_site));
+    building_sites.push_front(building_site);
+}
+
 void BuildingRegister::Remove(noBuildingSite* building_site)
 {
     RTTR_Assert(helpers::contains(building_sites, building_site));
@@ -108,6 +114,28 @@ void BuildingRegister::Remove(noBuilding* bld, BuildingType bldType)
     {
         RTTR_Assert(helpers::contains(harbors, bld));
         harbors.remove(static_cast<nobHarborBuilding*>(bld));
+    }
+}
+
+void BuildingRegister::MoveUp(noBuildingSite* building_site)
+{
+    auto buildingIter = std::find(building_sites.begin(), building_sites.end(), building_site);
+    if(buildingIter != building_sites.begin())
+    {
+        building_sites.splice(std::prev(buildingIter), building_sites, buildingIter);
+    }
+}
+
+void BuildingRegister::MoveDown(noBuildingSite* building_site)
+{
+    auto buildingIter = std::find(building_sites.begin(), building_sites.end(), building_site);
+    /*if(buildingIter != building_sites.end())
+    {
+        building_sites.splice(std::next(buildingIter), building_sites, buildingIter);
+    }*/
+    if(buildingIter != std::prev(building_sites.end()))
+    {
+        MoveUp(*std::next(buildingIter));
     }
 }
 

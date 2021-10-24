@@ -149,6 +149,7 @@ public:
     bool IsAHarborInSeaAttackDistance(MapPoint pos) const;
 
     /// Return the player with the given index
+    GamePlayer* GetPlayerptr(unsigned id);
     GamePlayer& GetPlayer(unsigned id);
     const GamePlayer& GetPlayer(unsigned id) const;
     unsigned GetNumPlayers() const;

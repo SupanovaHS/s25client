@@ -370,6 +370,33 @@ void GamePlayer::AddBuildingSite(noBuildingSite* bldSite)
     buildings.Add(bldSite);
 }
 
+void GamePlayer::MoveBuildingSiteFront(noBuildingSite* bldSite)
+{
+    RTTR_Assert(bldSite->GetPlayer() == GetPlayerId());
+    buildings.Remove(bldSite);
+    buildings.Addfront(bldSite);
+}
+
+void GamePlayer::MoveBuildingSiteUp(noBuildingSite* bldSite)
+{
+    RTTR_Assert(bldSite->GetPlayer() == GetPlayerId());
+    buildings.MoveUp(bldSite);
+
+}
+
+void GamePlayer::MoveBuildingSiteDown(noBuildingSite* bldSite)
+{
+    RTTR_Assert(bldSite->GetPlayer() == GetPlayerId());
+    buildings.MoveDown(bldSite);
+}
+
+void GamePlayer::MoveBuildingSiteBottom(noBuildingSite* bldSite)
+{
+    RTTR_Assert(bldSite->GetPlayer() == GetPlayerId());
+    buildings.Remove(bldSite);
+    buildings.Add(bldSite);
+}
+
 void GamePlayer::RemoveBuildingSite(noBuildingSite* bldSite)
 {
     RTTR_Assert(bldSite->GetPlayer() == GetPlayerId());

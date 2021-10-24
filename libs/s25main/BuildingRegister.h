@@ -27,11 +27,15 @@ public:
     void Deserialize2(SerializedGameData& sgd);
 
     void Add(noBuildingSite* building_site);
+    void Addfront(noBuildingSite* building_site);
     void Remove(noBuildingSite* building_site);
     void Add(noBuilding* bld, BuildingType bldType);
     void Remove(noBuilding* bld, BuildingType bldType);
+    void MoveUp(noBuildingSite* building_site);
+    void MoveDown(noBuildingSite * building_site);
 
     const std::list<noBuildingSite*>& GetBuildingSites() const { return building_sites; }
+    std::list<noBuildingSite*>& GetBuildingSitesptr()  { return building_sites; }
     const std::list<nobUsual*>& GetBuildings(BuildingType type) const;
     const std::list<nobMilitary*>& GetMilitaryBuildings() const { return military_buildings; }
     const std::list<nobHarborBuilding*>& GetHarbors() const { return harbors; }

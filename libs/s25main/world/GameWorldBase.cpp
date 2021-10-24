@@ -46,6 +46,11 @@ void GameWorldBase::InitAfterLoad()
     RTTR_FOREACH_PT(MapPoint, GetSize())
         RecalcBQ(pt);
 }
+GamePlayer* GameWorldBase::GetPlayerptr(const unsigned id)
+{
+    RTTR_Assert(id < GetNumPlayers());
+    return &players[id];
+}
 
 GamePlayer& GameWorldBase::GetPlayer(const unsigned id)
 {

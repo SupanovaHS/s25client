@@ -2233,18 +2233,18 @@ void AIPlayerJH::InitDistribution()
     goodSettings[7] = 10; // grain brewery
     goodSettings[8] = 10; // grain charburner
 
-    goodSettings[9] = 10;  // iron armory
+    goodSettings[9] = 1;  // iron armory
     goodSettings[10] = 10; // iron metalworks
 
     goodSettings[11] = 10; // coal armory
     goodSettings[12] = 10; // coal ironsmelter
     goodSettings[13] = 10; // coal mint
 
-    goodSettings[14] = 10; // wood sawmill
+    goodSettings[14] = 5; // wood sawmill
     goodSettings[15] = 10; // wood charburner
 
-    goodSettings[16] = 10; // boards new buildings
-    goodSettings[17] = 4;  // boards metalworks
+    goodSettings[16] = 5; // boards new buildings
+    goodSettings[17] = 10;  // boards metalworks
     goodSettings[18] = 2;  // boards shipyard
 
     goodSettings[19] = 10; // water bakery

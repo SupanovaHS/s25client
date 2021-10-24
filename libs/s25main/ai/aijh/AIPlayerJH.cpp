@@ -1002,9 +1002,10 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
         }
         case BuildingType::Quarry:
         {
-            unsigned numQuarries = GetBldPlanner().GetNumBuildings(BuildingType::Quarry);
+            /*unsigned numQuarries = GetBldPlanner().GetNumBuildings(BuildingType::Quarry);
             foundPos = FindBestPosition(around, AIResource::Stones, BUILDING_SIZE[type], searchRadius,
-                                        std::min(40u, 1 + numQuarries * 10));
+                                        std::min(40u, 1 + numQuarries * 10));*/
+            foundPos = FindBestPosition(around, AIResource::Stones, BUILDING_SIZE[type], searchRadius, 150);
             if(foundPos.isValid() && !ValidStoneinRange(foundPos))
             {
                 resourceMaps[AIResource::Stones].avoidPosition(foundPos);

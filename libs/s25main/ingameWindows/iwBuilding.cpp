@@ -94,6 +94,13 @@ void iwBuilding::Msg_PaintBefore()
 
     // Haus unbesetzt ggf ausblenden
     GetCtrl<ctrlText>(10)->SetVisible(!building->HasWorker());
+
+    // see if we have a worker en-route and show text in yellow if true
+    if(building->GetWorker() != nullptr)
+    {
+        // worker must be on his way
+        GetCtrl<ctrlText>(10)->SetTextColor(COLOR_YELLOW);
+    }
 }
 
 void iwBuilding::Msg_PaintAfter()

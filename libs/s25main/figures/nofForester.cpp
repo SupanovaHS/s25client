@@ -111,7 +111,7 @@ nofFarmhand::PointQuality nofForester::GetPointQuality(const MapPoint pt) const
     }
 
     // Terrain untersuchen
-    if(world->IsOfTerrain(pt, [](const auto& desc) { return desc.IsVital(); }))
+    if(world->IsOfTerrain(pt, [](const auto& desc) { return desc.IsTreePlantable(); }))
         return PointQuality::Class1;
     else
         return PointQuality::NotPossible;

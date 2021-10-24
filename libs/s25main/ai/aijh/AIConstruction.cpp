@@ -67,6 +67,8 @@ void AIConstruction::AddBuildJob(std::unique_ptr<BuildJob> job, bool front)
         }
         if(!alreadyinlist)
         {
+            //if(job->GetType() == BuildingType::Woodcutter) // ai seems to never build enough, and wood production halts
+               // front = true;
             if(front)
                 buildJobs.push_front(std::move(job));
             else

@@ -14,10 +14,12 @@
 #include "boost/filesystem/fstream.hpp"
 #include "buildings/noBuildingSite.h"
 #include "buildings/nobHarborBuilding.h"
+#include "buildings/nobHQ.h"
 #include "buildings/nobMilitary.h"
 #include "buildings/nobUsual.h"
 #include "helpers/MaxEnumValue.h"
 #include "helpers/containerUtils.h"
+#include "network/GameClient.h"
 #include "network/GameMessages.h"
 #include "notifications/BuildingNote.h"
 #include "notifications/ExpeditionNote.h"
@@ -226,6 +228,8 @@ void AIPlayerJH::RunGF(const unsigned gf, bool gfisnwf)
     {
         InitStoreAndMilitarylists();
         InitDistribution();
+        InitBuildOrders();
+        
     }
     if(isInitGfCompleted < 10)
     {
@@ -2108,6 +2112,69 @@ void AIPlayerJH::InitDistribution()
     aii.ChangeDistribution(goodSettings);
 }
 
+void AIPlayerJH::InitBuildOrders()
+{
+    auto buildOrders = aii.gwb.GetPlayer(aii.GetPlayerId()).GetStandardBuildOrder();
+
+    const auto findIndexByType = [](BuildingType type, BuildOrders buildOrders) {
+        int index = 0;
+        while(buildOrders[index] != type)
+        {
+            ++index;
+        }
+        return index;
+    };
+
+    auto moveTop = [&](int selection, BuildOrders) {
+        while(selection > 0)
+        {
+            std::swap(buildOrders[selection - 1], buildOrders[selection]);
+            --selection;
+        }
+    };
+
+    auto moveBottom = [&](int selection, BuildOrders) {
+        while(selection < static_cast<int>(buildOrders.size() - 1))
+        {
+            std::swap(buildOrders[selection + 1], buildOrders[selection]);
+            ++selection;
+        }
+    };
+
+    auto selection = 0;
+    // this should help the AI get a good solid start on early games
+
+    //Note: military builds are quite high on this list, may need to lower?
+
+    // iron smelter and metalworks
+
+    selection = findIndexByType(BuildingType::Metalworks, buildOrders);
+    moveTop(selection, buildOrders);
+    selection = findIndexByType(BuildingType::Ironsmelter, buildOrders);
+    moveTop(selection, buildOrders);
+
+    // prioritize wood
+    selection = findIndexByType(BuildingType::Forester, buildOrders);
+    moveTop(selection, buildOrders);
+    selection = findIndexByType(BuildingType::Woodcutter, buildOrders);
+    moveTop(selection, buildOrders);
+    selection = findIndexByType(BuildingType::Sawmill, buildOrders);
+    moveTop(selection, buildOrders);
+
+    // lower mines
+    selection = findIndexByType(BuildingType::CoalMine, buildOrders);
+    moveBottom(selection, buildOrders);
+    selection = findIndexByType(BuildingType::IronMine, buildOrders);
+    moveBottom(selection, buildOrders);
+    selection = findIndexByType(BuildingType::GoldMine, buildOrders);
+    moveBottom(selection, buildOrders);
+    selection = findIndexByType(BuildingType::GraniteMine, buildOrders);
+    moveBottom(selection, buildOrders);
+
+    // set use build order flag
+    aii.ChangeBuildOrder(true, buildOrders);
+}
+
 bool AIPlayerJH::ValidTreeinRange(const MapPoint pt)
 {
     unsigned max_radius = 6;
@@ -2419,6 +2486,12 @@ void AIPlayerJH::AdjustSettings()
                 aii.ChangeTools(toolsettings);
                 break;
             }
+        }
+
+        // set default buildorders
+        if(aii.GetBuildings(BuildingType::Sawmill).size() >= 3)
+        {
+            aii.ChangeBuildOrder(false, BuildOrders()); // set to default
         }
     }
 

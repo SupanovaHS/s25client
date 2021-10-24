@@ -46,6 +46,9 @@ public:
     const BuildingPlanner& GetBldPlanner() const { return *bldPlanner; }
     const AIJob* GetCurrentJob() const { return currentJob.get(); }
     unsigned GetNumJobs() const;
+    unsigned GetEventNum() const;
+    unsigned GetBuildJobNum() const;
+    unsigned GetConnectJobNum() const;
 
     void RunGF(unsigned gf, bool gfisnwf) override;
     void OnChatMessage(unsigned sendPlayerId, ChatDestination, const std::string& msg) override;

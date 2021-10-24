@@ -1165,8 +1165,6 @@ void AIPlayerJH::HandleBuilingDestroyed(MapPoint pt, BuildingType bld)
 {
     switch(bld)
     {
-        case BuildingType::Charburner:
-        case BuildingType::Farm: SetFarmedNodes(pt, false); break;
         case BuildingType::Charburner: SetFarmedNodes(pt, false ,3); break;
         case BuildingType::Farm: SetFarmedNodes(pt, false,2); break;
         case BuildingType::HarborBuilding:
@@ -1256,7 +1254,12 @@ void AIPlayerJH::HandleBuildingFinished(const MapPoint pt, BuildingType bld)
         case BuildingType::Shipyard: aii.SetShipYardMode(pt, true); break;
 
         case BuildingType::Storehouse: break;
-        case BuildingType::Woodcutter: AddBuildJob(BuildingType::Sawmill, pt); break;
+        case BuildingType::Woodcutter:
+        {
+            if(construction->Wanted(BuildingType::Sawmill) == true)
+                AddBuildJob(BuildingType::Sawmill, pt); // only add if wanted (stops 30 sawmills being ordered....)
+            break;
+        }
         default: break;
     }
 }

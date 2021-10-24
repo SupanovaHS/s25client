@@ -149,8 +149,12 @@ int AIInterface::GetResourceRating(const MapPoint pt, AIResource res) const
             {
                 const auto& desc = gwb.GetDescription();
                 const auto& node = gwb.GetNode(pt);
+
+               if(gwb.IsOfTerrain(pt, [](const TerrainDesc& desc) { return desc.kind == TerrainKind::Mountain; }))
+                    return RES_RADIUS[res] *8; // give mountain terrain a boost to encourage AI growth near by
                 if(desc.get(node.t1).Is(ETerrain::Walkable) || desc.get(node.t2).Is(ETerrain::Walkable))
                     return RES_RADIUS[res];
+                
             }
             break;
         case AIResource::Gold:

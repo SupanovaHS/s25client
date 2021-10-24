@@ -1576,7 +1576,7 @@ void AIPlayerJH::CheckGranitMine()
 {
     // stop production in granite mines when the ai has many stones (100+ and at least 15 for each warehouse)
     bool enableProduction =
-      AmountInStorage(GoodType::Stones) < 100 || AmountInStorage(GoodType::Stones) < 15 * aii.GetStorehouses().size();
+      AmountInStorage(GoodType::Stones) < 200 || AmountInStorage(GoodType::Stones) < 40 * aii.GetStorehouses().size();
     for(const nobUsual* mine : aii.GetBuildings(BuildingType::GraniteMine))
     {
         // !productionDisabled != enableProduction

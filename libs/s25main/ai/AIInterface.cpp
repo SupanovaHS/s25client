@@ -127,7 +127,7 @@ int AIInterface::GetResourceRating(const MapPoint pt, AIResource res) const
             else if(IsBuildingOnNode(pt, BuildingType::Woodcutter))
                 return -40;
             else if(IsBuildingOnNode(pt, BuildingType::Forester))
-                return 20;
+                return 40;
             break;
         case AIResource::Stones:
             if(GetSurfaceResource(pt) == AISurfaceResource::Stones)

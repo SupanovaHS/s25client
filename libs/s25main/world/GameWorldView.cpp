@@ -389,7 +389,11 @@ void GameWorldView::DrawProductivity(const noBaseBuilding& no, const DrawPoint& 
         unsigned color = COLOR_0_PERCENT;
 
         if(!n.HasWorker())
+        {
             text = _("(House unoccupied)");
+            if(n.GetWorker() != nullptr)
+                color = COLOR_YELLOW;
+        }
         else if(n.IsProductionDisabledVirtual())
             text = _("(stopped)");
         else

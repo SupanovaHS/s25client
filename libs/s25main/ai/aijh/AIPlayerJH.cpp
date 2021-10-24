@@ -1060,9 +1060,15 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
                 foundPos = MapPoint::Invalid();
             break;
         case BuildingType::Farm:
+            if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester))  // check no forester near by
             foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);
-            if(foundPos.isValid())
-                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);
+            /*if(foundPos.isValid())
+                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);*/
+            break;
+        case BuildingType::Charburner:
+            if(!construction->OtherUsualBuildingInRadius(around, 12,
+                                                         BuildingType::Forester)) // check no forester near by
+                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 100); // large space needed
             break;
         case BuildingType::Catapult:
             foundPos = SimpleFindPosition(around, BUILDING_SIZE[type], searchRadius);

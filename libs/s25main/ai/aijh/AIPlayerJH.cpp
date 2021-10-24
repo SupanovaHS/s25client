@@ -2288,8 +2288,13 @@ void AIPlayerJH::InitBuildOrders()
 
     //Note: military builds are quite high on this list, may need to lower?
 
-    // iron smelter and metalworks
+    // coal and iron mines
+    selection = findIndexByType(BuildingType::CoalMine, buildOrders);
+    moveTop(selection, buildOrders);
+    selection = findIndexByType(BuildingType::IronMine, buildOrders);
+    moveTop(selection, buildOrders);
 
+    // iron smelter and metalworks
     selection = findIndexByType(BuildingType::Metalworks, buildOrders);
     moveTop(selection, buildOrders);
     selection = findIndexByType(BuildingType::Ironsmelter, buildOrders);
@@ -2303,11 +2308,7 @@ void AIPlayerJH::InitBuildOrders()
     selection = findIndexByType(BuildingType::Sawmill, buildOrders);
     moveTop(selection, buildOrders);
 
-    // lower mines
-    selection = findIndexByType(BuildingType::CoalMine, buildOrders);
-    moveBottom(selection, buildOrders);
-    selection = findIndexByType(BuildingType::IronMine, buildOrders);
-    moveBottom(selection, buildOrders);
+    // lower gold and granite for now
     selection = findIndexByType(BuildingType::GoldMine, buildOrders);
     moveBottom(selection, buildOrders);
     selection = findIndexByType(BuildingType::GraniteMine, buildOrders);
@@ -2641,8 +2642,8 @@ void AIPlayerJH::AdjustSettings()
             }
         }
 
-        // set default buildorders
-        if(aii.GetBuildings(BuildingType::Sawmill).size() >= 3)
+        // set default buildorders after we have at lease 1 iron and 1 coal mine built
+        if(!aii.GetBuildings(BuildingType::IronMine).empty() && !aii.GetBuildings(BuildingType::CoalMine).empty())
         {
             aii.ChangeBuildOrder(false, BuildOrders()); // set to default
         }

@@ -200,6 +200,7 @@ public:
     // finds all unused flags and roads, removes flags or reconnects them as neccessary
     void RemoveAllUnusedRoads(MapPoint pt);
     void CheckForUnconnectedBuildingSites();
+    void CheckForUnconnectedBuildings();
     // check if there are free soldiers (in hq/storehouses)
     unsigned SoldierAvailable(int rank = -1);
 

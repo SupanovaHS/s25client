@@ -1906,6 +1906,35 @@ void AIPlayerJH::CheckForUnconnectedBuildingSites()
         }
         if(!foundRoute)
             construction->AddConnectFlagJob(flag);
+void AIPlayerJH::CheckForUnconnectedBuildings()
+{
+    /// as more and more road optimizationstake take place, the chance of buildings being severed from the main road system increases
+    /// as with all optimizations there is a trade off, we have to periodically check
+    /// each building type list is checked from a random start position, but only a set amount from each list
+    /// may have to reduce the amount checked in late games?
+  
+    for(const auto type : helpers::EnumRange<BuildingType>{}) // performance?????
+    {       
+        auto bldList = player.GetBuildingRegister().GetBuildings(type);
+        if(!bldList.empty())
+        {
+            int randombld = rand() % (bldList.size());
+            auto it = bldList.begin();
+            std::advance(it, randombld);
+            auto bld = (*it);
+
+            for(int i=0;i < 10;++i)
+            {
+                if(construction->IsConnectedToRoadSystem(bld->GetFlag()) == false)
+                {
+                    construction->AddConnectFlagJob(bld->GetFlag());
+                }
+                ++it;
+                if(it == bldList.end()) // wrap around
+                    it = bldList.begin();
+                bld = (*it);
+            }
+        }
     }
 }
 

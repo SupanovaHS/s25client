@@ -702,7 +702,24 @@ MapPoint AIPlayerJH::FindBestPosition(const MapPoint& pt, AIResource res, Buildi
                                       int minimum)
 {
     resourceMaps[res].updateAround(pt, radius);
-    return resourceMaps[res].findBestPosition(pt, size, radius, minimum);
+
+    if(res != AIResource::Fish)
+        return resourceMaps[res].findBestPosition(pt, size, radius, minimum);
+   
+    // find water with fish
+    const auto& waterpt = resourceMaps[res].findBestPosition(pt, size, radius, minimum);
+
+    // waterpt is water, not a building site, so now we need to find a building site near by
+   // validate point
+    if(waterpt.isValid())
+    {
+        // initialize map
+        resourceMaps[AIResource::Plantspace].updateAround(waterpt, radius);
+        // get spot
+        return resourceMaps[AIResource::Plantspace].findBestPosition(waterpt, size, 5, minimum);
+    }
+    return waterpt;
+    
 }
 
 void AIPlayerJH::ExecuteAIJob()

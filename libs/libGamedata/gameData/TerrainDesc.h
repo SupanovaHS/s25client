@@ -84,6 +84,8 @@ struct TerrainDesc
     bool IsUsableByAnimals() const;
     /// Returns whether corn fields can grow on the terrain (no dessert, mountain etc)
     bool IsVital() const;
+    // can tree be planted here
+    bool IsTreePlantable() const;
     /// Return true if the terrain has the given attribute
     bool Is(ETerrain what) const;
     /// Get the position of the up side down triangle

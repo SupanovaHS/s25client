@@ -132,6 +132,10 @@ bool TerrainDesc::IsVital() const
 {
     return kind == TerrainKind::Land && Is(ETerrain::Buildable);
 }
+bool TerrainDesc::IsTreePlantable() const
+{
+    return (kind == TerrainKind::Land) && Is(ETerrain::Walkable);
+}
 
 TerrainDesc::Triangle TerrainDesc::GetUSDTriangle() const
 {

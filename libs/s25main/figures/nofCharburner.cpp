@@ -164,7 +164,7 @@ nofFarmhand::PointQuality nofCharburner::GetPointQuality(const MapPoint pt) cons
 
     // Terrain untersuchen (need walkable land)
     if(world->IsOfTerrain(
-         pt, [](const auto& desc) { return desc.Is(ETerrain::Walkable) && desc.kind == TerrainKind::Land; }))
+         pt, [](const auto& desc) { return desc.IsTreePlantable(); }))
         return PointQuality::Class3;
     else
         return PointQuality::NotPossible;

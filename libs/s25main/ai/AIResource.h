@@ -95,5 +95,5 @@ constexpr helpers::EnumArray<unsigned, AIResource> SUPPRESS_UNUSED RES_RADIUS = 
   8, // Wood
   8, // Stones
   3, // Plantspace
-  5, // Borderland
+  8, // Borderland
 };

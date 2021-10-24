@@ -572,7 +572,7 @@ bool dskGameInterface::Msg_LeftDown(const MouseCoords& mc)
         {
             if(!WINDOWMANAGER.FindNonModalWindow(CGI_BUILDING + MapBase::CreateGUIID(cSel)))
                 WINDOWMANAGER.Show(
-                  std::make_unique<iwBuildingSite>(gwv, worldViewer.GetWorld().GetSpecObj<noBuildingSite>(cSel)));
+                  std::make_unique<iwBuildingSite>(gwv, worldViewer.GetWorld().GetSpecObj<noBuildingSite>(cSel),worldViewer.GetWorldNonConst()));
             return true;
         }
 

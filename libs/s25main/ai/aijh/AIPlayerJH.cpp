@@ -1336,38 +1336,47 @@ void AIPlayerJH::HandleNoMoreResourcesReachable(const MapPoint pt, BuildingType 
 
     if(!aii.IsObjectTypeOnNode(pt, NodalObjectType::Building))
         return;
-    // keep 2 woodcutters for each forester even if they sometimes run out of trees
+
+   
     if(bld == BuildingType::Woodcutter)
     {
-        for(const nobUsual* forester : aii.GetBuildings(BuildingType::Forester))
+        if(aii.GetBuildings(BuildingType::Woodcutter).size() <= 2)
+            return; // always keep at least 2 and rely on the fact the forester has only just been built
+        //
+        // keep 2 woodcutters for each forester even if they sometimes run out of trees
+        // if wood res is too low, just delete
+        if(aii.GetResourceRating(pt, AIResource::Wood) > 50) // only if it's above 50
         {
-            // is the forester somewhat close?
-            if(gwb.CalcDistance(pt, forester->GetPos()) <= RES_RADIUS[AIResource::Wood])
+            for(const nobUsual* forester : aii.GetBuildings(BuildingType::Forester))
             {
-                // then find it's 2 woodcutters
-                unsigned maxdist = gwb.CalcDistance(pt, forester->GetPos());
-                int betterwoodcutters = 0;
-                for(const nobUsual* woodcutter : aii.GetBuildings(BuildingType::Woodcutter))
+                // is the forester somewhat close?
+                if(gwb.CalcDistance(pt, forester->GetPos()) <= RES_RADIUS[AIResource::Wood] + 4)
                 {
-                    // dont count the woodcutter in question
-                    if(pt == woodcutter->GetPos())
-                        continue;
-                    // TODO: We currently don't take the distance to the forester into account when placing a woodcutter
-                    // This leads to points beeing equally good for placing but later it will be destroyed. Avoid that
-                    // by checking only close woddcutters
-                    if(gwb.CalcDistance(woodcutter->GetPos(), pt) > RES_RADIUS[AIResource::Wood])
-                        continue;
-                    // closer or equally close to forester than woodcutter in question?
-                    if(gwb.CalcDistance(woodcutter->GetPos(), forester->GetPos()) <= maxdist)
+                    // then find it's 2 woodcutters
+                    unsigned maxdist = gwb.CalcDistance(pt, forester->GetPos());
+                    int betterwoodcutters = 0;
+                    for(const nobUsual* woodcutter : aii.GetBuildings(BuildingType::Woodcutter))
                     {
-                        betterwoodcutters++;
-                        if(betterwoodcutters >= 2)
-                            break;
+                        // dont count the woodcutter in question
+                        if(pt == woodcutter->GetPos())
+                            continue;
+                        // TODO: We currently don't take the distance to the forester into account when placing a
+                        // woodcutter This leads to points beeing equally good for placing but later it will be
+                        // destroyed. Avoid that by checking only close woddcutters
+                        if(gwb.CalcDistance(woodcutter->GetPos(), pt) > RES_RADIUS[AIResource::Wood] + 4)
+                            continue;
+                        // closer or equally close to forester than woodcutter in question?
+                        if(gwb.CalcDistance(woodcutter->GetPos(), forester->GetPos()) <= maxdist)
+                        {
+                            betterwoodcutters++;
+                            if(betterwoodcutters >= 2)
+                                break;
+                        }
                     }
+                    // couldnt find 2 closer woodcutter -> keep it alive
+                    if(betterwoodcutters < 2)
+                        return;
                 }
-                // couldnt find 2 closer woodcutter -> keep it alive
-                if(betterwoodcutters < 2)
-                    return;
             }
         }
     }

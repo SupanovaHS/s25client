@@ -9,6 +9,7 @@
 #include "ai/aijh/AIPlayerJH.h"
 #include "ai/aijh/BuildingPlanner.h"
 #include "ai/aijh/PositionSearch.h"
+#include "buildings/nobBaseWarehouse.h"
 #include "buildings/noBuildingSite.h"
 #include "world/GameWorldBase.h"
 #include "nodeObjs/noFlag.h"
@@ -65,7 +66,7 @@ void BuildJob::TryToBuild()
 {
     AIConstruction& aiConstruction = aijh.GetConstruction();
 
-    if(aijh.GetInterface().GetBuildingSites().size() > 40)
+    if(aijh.GetInterface().GetBuildingSites().size() > 100)
     {
         return;
     }
@@ -98,23 +99,110 @@ void BuildJob::TryToBuild()
         foundPos = aijh.FindPositionForBuildingAround(type, around);
         if(BuildingProperties::IsMilitary(type))
         {
+            AIInterface& aiInterface = aijh.GetInterface();
+            if(aiInterface.GetMilitaryBuildings().size() > 45) // allow some expansion before capping to encourage soldier upgrades
+            {
+                // now count up how many soldiers we have in reserve (sat in storehouses) and only allow if we have
+                // spare Generals The idea here is to slow down expansion allowing time for soldiers to be upgraded
+                const auto& storehouses = aiInterface.GetStorehouses();
+                if(!storehouses.empty())
+                {
+                    auto generalCount = 0;
+                    for(const auto& sh : storehouses)
+                    {
+                        generalCount += sh->GetInventory().people[Job::General];
+                    }
+
+
+                    // now add up our building sites and deduct the total from general count to ensure we don't spam out 50 military buildings in one hit
+                    for( const auto& bldSite : aiInterface.GetBuildingSites())
+                    {
+                        if(BuildingProperties::IsMilitary(bldSite->GetBuildingType()))
+                        {
+                            --generalCount; // reserve a soldier
+                        }
+                    }
+                    
+                    if(generalCount < 30) // keep a reserve for enemy expansion and attacks
+                    {
+                        state = JobState::Failed;
+                        return; // do nothing
+                    }
+                }
+            }
+
             if(foundPos.isValid())
             {
                 // could we build a bigger military building? check if the location is surrounded by terrain that does
                 // not allow normal buildings (probably important map part)
-                AIInterface& aiInterface = aijh.GetInterface();
-                RTTR_Assert(aiInterface.GetBuildingQuality(foundPos) == aijh.GetAINode(foundPos).bq);
-                if(type != BuildingType::Fortress && aiInterface.GetBuildingQuality(foundPos) != BuildingQuality::Mine
-                   && aiInterface.GetBuildingQuality(foundPos) > BUILDING_SIZE[type]
-                   && aijh.BQsurroundcheck(foundPos, 6, true, 10) < 10)
+               
+
+                // if we near a mountain , allow larger
+                const auto& mine =
+                  aijh.SimpleFindPosition(foundPos, BuildingQuality::Mine, 3); // see if we can build a mine?
+                const auto& bettersite =
+                  aijh.SimpleFindPosition(foundPos, BuildingQuality::House, 3); // see if we can build a watchtower
+
+                auto allowLarger = false;
+
+                switch(aijh.getAIInterface()
+                         .GetBuildings(BuildingType::Sawmill)
+                         .size()) // limit to smaller types, this encourages a fast initial land grab, also helps save
+                                  // resources for low starting resources
                 {
-                    // more than 80% is unbuildable in range 7 -> upgrade
-                    for(BuildingType bld : BuildingProperties::militaryBldTypes)
+                    case 0:
+                    case 1:
+                    case 2:
                     {
-                        if(BUILDING_SIZE[bld] > BUILDING_SIZE[type] && aiInterface.CanBuildBuildingtype(bld))
+                        type = BuildingType::Barracks;
+                        break;
+                    }
+                    case 3:
+                    case 4:
+                    {
+                        type = BuildingType::Guardhouse;
+                        break;
+                    }
+                    default: allowLarger = true; break; // allow larger when enough sawmills
+                }
+                if(allowLarger == false) // no need to check when we got enough sawmills
+                    if(mine.isValid() && !aijh.getAIInterface().GetBuildings(BuildingType::Sawmill).empty())
+                    {
+                        allowLarger = true;
+                        if(bettersite.isValid())
                         {
-                            type = bld;
-                            break;
+                            foundPos = bettersite;
+                            type = BuildingType::Watchtower; // upgrade to  watchtower better coverage of mountain
+                        }
+                        if(!aijh.UpgradeBldPos.isValid())
+                        {
+                            // no upgrade building found, might be early game, force type
+                            const auto& castlesite = aijh.SimpleFindPosition(foundPos, BuildingQuality::Castle,3); // see if we can build a fortress
+                            if(castlesite.isValid())
+                            {
+                                foundPos = castlesite;
+                                aijh.UpgradeBldPos = castlesite;
+                                type = BuildingType::Fortress;
+                            }
+                        }
+                    }
+
+                if(allowLarger == true)
+                {
+                    RTTR_Assert(aiInterface.GetBuildingQuality(foundPos) == aijh.GetAINode(foundPos).bq);
+                    if(type != BuildingType::Fortress
+                       && aiInterface.GetBuildingQuality(foundPos) != BuildingQuality::Mine
+                       && aiInterface.GetBuildingQuality(foundPos) > BUILDING_SIZE[type]
+                       && aijh.BQsurroundcheck(foundPos, 6, true, 10) < 10)
+                    {
+                        // more than 80% is unbuildable in range 7 -> upgrade
+                        for(BuildingType bld : BuildingProperties::militaryBldTypes)
+                        {
+                            if(BUILDING_SIZE[bld] > BUILDING_SIZE[type] && aiInterface.CanBuildBuildingtype(bld))
+                            {
+                                type = bld;
+                                break;
+                            }
                         }
                     }
                 }

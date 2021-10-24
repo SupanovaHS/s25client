@@ -1928,12 +1928,28 @@ bool AIPlayerJH::IsFlagPartofCircle(const noFlag& startFlag, unsigned maxlen, co
 
 void AIPlayerJH::RemoveAllUnusedRoads(const MapPoint pt)
 {
-    std::vector<const noFlag*> flags = construction->FindFlags(pt, 25);
+    std::vector<const noFlag*> flags = construction->FindFlags(pt, 50);
     // Jede Flagge testen...
     std::vector<const noFlag*> reconnectflags;
     for(const noFlag* flag : flags)
     {
+        for(const auto dir : helpers::EnumRange<Direction>{})
+        {
+            if(dir == Direction::NorthWest)
+                continue;
+            const auto& route = flag->GetRoute(dir);
+            if(route != nullptr)
+            {
+                if(route->GetLength() >= 4) // check length of routes while we are here
+                {
+                    aii.DestroyRoad(flag->GetPos(), dir); // brutally destroy flag road and building, forcing a re route
+                    reconnectflags.push_back(flag);
+                }
+            }
+        }
         if(RemoveUnusedRoad(*flag, boost::none, true, false))
+            reconnectflags.push_back(flag);
+        if(construction->IsConnectedToRoadSystem(flag) == false) // make sure we are connected to a store house...
             reconnectflags.push_back(flag);
     }
     UpdateNodesAround(pt, 25);
@@ -1943,8 +1959,8 @@ void AIPlayerJH::RemoveAllUnusedRoads(const MapPoint pt)
 
 void AIPlayerJH::CheckForUnconnectedBuildingSites()
 {
-    if(construction->GetConnectJobNum() > 0 || construction->GetBuildJobNum() > 0)
-        return;
+   // if(construction->GetConnectJobNum() > 0 || construction->GetBuildJobNum() > 0)
+       // return;
     for(noBuildingSite* bldSite : player.GetBuildingRegister().GetBuildingSites()) //-V807
     {
         noFlag* flag = bldSite->GetFlag();
@@ -1955,12 +1971,38 @@ void AIPlayerJH::CheckForUnconnectedBuildingSites()
                 continue;
             if(flag->GetRoute(dir))
             {
+                if(bldSite->optimalRouteAttempted() == false)
+                {
+                    bldSite->setOptimalRouteAttempted(true);
+        
+                    // check our road length, and make sure we have flags on it
+                    const auto& route = flag->GetRoute(dir);
+                    if(route->GetLength() >= 4)
+                    {
+                        aii.DestroyFlag(bldSite->GetFlagPos()); // brutally destroy flag road and building, forcing a re route
+                        RemoveAllUnusedRoads(bldSite->GetPos());
+                    }
+                    continue;
+                }
+
                 foundRoute = true;
                 break;
             }
         }
         if(!foundRoute)
             construction->AddConnectFlagJob(flag);
+        else
+        {
+            // check route leads to a store house
+            if(construction->IsConnectedToRoadSystem(flag) == false)
+            {
+                aii.DestroyFlag(bldSite->GetFlagPos()); // brutally destroy flag road and building, forcing a re route
+                RemoveAllUnusedRoads(bldSite->GetPos());
+            }
+        }
+    }
+}
+
 void AIPlayerJH::CheckForUnconnectedBuildings()
 {
     /// as more and more road optimizationstake take place, the chance of buildings being severed from the main road system increases

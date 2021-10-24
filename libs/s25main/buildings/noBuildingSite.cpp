@@ -51,6 +51,7 @@ noBuildingSite::noBuildingSite(const BuildingType type, const MapPoint pos, cons
 
     // Baustelle in den Index eintragen, damit die Wirtschaft auch Bescheid weiß
     world->GetPlayer(player).AddBuildingSite(this);
+    optimalRoute = false;
 }
 
 /// Konstruktor für Hafenbaustellen vom Schiff aus
@@ -68,6 +69,7 @@ noBuildingSite::noBuildingSite(const MapPoint pos, const unsigned char player)
     // Baumaterialien in der Inventur verbuchen
     owner.DecreaseInventoryWare(GoodType::Boards, boards);
     owner.DecreaseInventoryWare(GoodType::Stones, stones);
+    optimalRoute = false;
 }
 
 noBuildingSite::~noBuildingSite() = default;

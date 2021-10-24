@@ -42,13 +42,19 @@ class noBuildingSite : public noBaseBuilding
     unsigned char build_progress;
     /// Bestellte Bretter und Steine, d.h. Steine/Bretter, die noch "bestellt" wurden, aber noch nicht da sind
     std::list<Ware*> ordered_boards, ordered_stones;
+    // has an optimal route been tried
+    bool optimalRoute;
 
 public:
     unsigned char getUsedBoards() const { return used_boards; }
     unsigned char getUsedStones() const { return used_stones; }
     unsigned char getBoards() const { return boards; }
     unsigned char getStones() const { return stones; }
+    bool optimalRouteAttempted() const { return optimalRoute; }
+    void setOptimalRouteAttempted(bool attempted){ optimalRoute = attempted;}
 
+    std::list<Ware*> getOrderedBoards() const { return ordered_boards; }
+    std::list<Ware*> getOrderedStones() const { return ordered_stones; }
     noBuildingSite(BuildingType type, MapPoint pos, unsigned char player);
     /// Konstruktor für Hafenbaustellen vom Schiff aus
     noBuildingSite(MapPoint pos, unsigned char player);

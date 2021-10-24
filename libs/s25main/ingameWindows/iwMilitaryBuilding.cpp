@@ -213,6 +213,7 @@ void iwMilitaryBuilding::Msg_ButtonClick(const unsigned ctrl_id)
         case 10: // send home button (addon)
         {
             gcFactory.SendSoldiersHome(building->GetPos());
+            gcFactory.OrderNewSoldiers(building->GetPos());
         }
         break;
     }

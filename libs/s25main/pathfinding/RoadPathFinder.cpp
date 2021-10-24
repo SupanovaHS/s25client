@@ -193,7 +193,9 @@ bool RoadPathFinder::FindPathImpl(const noRoadNode& start, const noRoadNode& goa
 
             // Check the 2 flags, one is the current node, so we need the other
             noRoadNode* neighbour = route->GetF1();
-            if(neighbour == &best)
+            const noRoadNode& neighbourRef = route->GetF1Ref();
+
+            if(&neighbourRef == &best)
                 neighbour = route->GetF2();
 
             // this eliminates 1/6 of all nodes and avoids cost calculation and further checks,

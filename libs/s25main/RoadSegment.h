@@ -48,6 +48,8 @@ public:
     unsigned GetLength() const { return route.size(); }
     /// gibt Flagge 1 zurück
     noRoadNode* GetF1() const { return f1; }
+    noRoadNode& GetF1Ref() const { return *f1; }
+
     /// setzt Flagge 1 auf o
     void SetF1(noRoadNode* o) { f1 = o; }
     /// gibt Flagge 2 zurück

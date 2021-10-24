@@ -487,8 +487,7 @@ helpers::OptionalEnum<BuildingType> AIConstruction::ChooseMilitaryBuilding(const
     if(biggestBld == BuildingType::Watchtower || biggestBld == BuildingType::Fortress)
     {
         if(aijh.UpdateUpgradeBuilding() < 0 && bldPlanner.GetNumBuildingSites(biggestBld) < 1
-           && (inventory.goods[GoodType::Stones] > 20 || bldPlanner.GetNumBuildings(BuildingType::Quarry) > 0)
-           && rand() % 10 != 0)
+            && rand() % 10 != 0)
         {
             return biggestBld;
         }

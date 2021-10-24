@@ -102,15 +102,16 @@ iwAIDebug::iwAIDebug(GameWorldView& gwv, const std::vector<const AIPlayer*>& ais
     overlays->AddString("BuildingQuality");
     overlays->AddString("Reachability");
     overlays->AddString("Farmed");
-    overlays->AddString("Wood");
-    overlays->AddString("Stones");
     overlays->AddString("Gold");
     overlays->AddString("Ironore");
     overlays->AddString("Coal");
     overlays->AddString("Granite");
+    overlays->AddString("Fish");
+    overlays->AddString("Wood");
+    overlays->AddString("Stones");
     overlays->AddString("Plantspace");
     overlays->AddString("Borderland");
-    overlays->AddString("Fish");
+
 
     // Show 7 lines of text and 1 empty line
     text = AddMultiline(ID_Text, DrawPoint(15, 120), Extent(250, 8 * NormalFont->getHeight()), TextureColor::Grey,
@@ -155,8 +156,9 @@ void iwAIDebug::Msg_PaintBefore()
         return;
     }
 
-    ss << "Jobs to do: " << printer->ai->GetNumJobs() << std::endl << std::endl;
-
+    ss << "Jobs to do: " << printer->ai->GetNumJobs() << std::endl
+       << "Evt: " << printer->ai->GetEventNum() << " Bld: " << printer->ai->GetBuildJobNum()
+       << " Con: " << printer->ai->GetConnectJobNum() << std::endl;
     const auto* bj = dynamic_cast<const AIJH::BuildJob*>(currentJob);
     const auto* ej = dynamic_cast<const AIJH::EventJob*>(currentJob);
 

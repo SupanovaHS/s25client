@@ -421,6 +421,20 @@ unsigned AIPlayerJH::GetNumJobs() const
 {
     return eventManager.GetEventNum() + construction->GetBuildJobNum() + construction->GetConnectJobNum();
 }
+unsigned AIPlayerJH::GetEventNum() const
+{
+   return eventManager.GetEventNum();
+}
+unsigned AIPlayerJH::GetBuildJobNum() const
+{
+    return construction->GetBuildJobNum();
+}
+unsigned AIPlayerJH::GetConnectJobNum() const
+{
+    return construction->GetConnectJobNum();
+}
+
+
 
 /// returns the warehouse closest to the upgradebuilding or if it cant find a way the first warehouse and if there is no
 /// warehouse left null

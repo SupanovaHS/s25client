@@ -724,35 +724,35 @@ void nofCarrier::RoadSplitted(RoadSegment* rs1, RoadSegment* rs2)
         otherRoad->setCarrier(1, world->GetPlayer(player).OrderDonkey(otherRoad));
 }
 
-void nofCarrier::HandleDerivedEvent(const unsigned id)
+void nofCarrier ::HandleDerivedEvent(const unsigned id)
 {
     switch(id)
     {
-        // Produktivitätsevent
+        // Productivity event
         case 1:
         {
             productivity_ev = nullptr;
 
-            // Gucken, ob bis jetzt gearbeitet wurde/wird oder nicht, je nachdem noch was dazuzählen
+            // See whether or not work has been / is being done so far, depending on what counts
             if(since_working_gf != 0xFFFFFFFF)
             {
-                // Es wurde bis jetzt nicht mehr gearbeitet, das also noch dazuzählen
+                // We haven't worked any more so far, so add that to that
                 worked_gf += static_cast<unsigned short>(GetEvMgr().GetCurrentGF() - since_working_gf);
-                // Zähler zurücksetzen
+                // Reset counter
                 since_working_gf = GetEvMgr().GetCurrentGF();
             }
 
-            // Produktivität ausrechnen
+            // Calculate productivity
             productivity = worked_gf * 100 / PRODUCTIVITY_GF;
 
-            // Zähler zurücksetzen
+            // Reset counter
             worked_gf = 0;
 
-            // Nächstes Event anmelden
+            // Register for the next event
             productivity_ev = GetEvMgr().AddEvent(this, PRODUCTIVITY_GF, 1);
 
-            // Reif für einen Esel?
-            if(productivity >= DONKEY_PRODUCTIVITY && ct == CarrierType::Normal)
+            // Ready for a donkey?
+            if(productivity >= DONKEY_PRODUCTIVITY && ct == CarrierType ::Normal)
                 workplace->UpgradeDonkeyRoad();
         }
         break;

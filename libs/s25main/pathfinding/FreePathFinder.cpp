@@ -169,13 +169,13 @@ bool FreePathFinder::FindPathAlternatingConditions(const MapPoint start, const M
         // Knoten in alle 6 Richtungen bilden
         for(const auto dir : helpers::enumRange(startDir))
         {
-            // Koordinaten des entsprechenden umliegenden Punktes bilden
+            // Form coordinates of the corresponding surrounding point
             MapPoint neighbourPos = gwb_.GetNeighbour(nodes[bestId].mapPt, dir);
 
-            // ID des umliegenden Knotens bilden
+            // Form the ID of the surrounding node
             unsigned nbId = gwb_.GetIdx(neighbourPos);
 
-            // Knoten schon auf dem Feld gebildet ?
+            // Knot already formed in the field?
             if((prevStepEven && nodes[nbId].lastVisited == currentVisit)
                || (!prevStepEven && nodes[nbId].lastVisitedEven == currentVisit))
             {

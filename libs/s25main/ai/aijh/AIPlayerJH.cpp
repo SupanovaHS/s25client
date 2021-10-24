@@ -1437,6 +1437,7 @@ void AIPlayerJH::HandleShipBuilt(const MapPoint pt)
 void AIPlayerJH::HandleBorderChanged(const MapPoint pt)
 {
     UpdateNodesAround(pt, 11); // todo: fix radius
+    AddMilitaryBuildJob(pt);
 
     const auto* mil = gwb.GetSpecObj<nobMilitary>(pt);
     if(mil)

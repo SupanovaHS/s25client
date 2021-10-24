@@ -169,7 +169,7 @@ bool MapLoader::InitNodes(const libsiedler2::ArchivItem_Map& map, Exploration ex
         Resource resource;
         // Wasser?
         if(mapResource == 0x20 || mapResource == 0x21)
-            resource = Resource(ResourceType::Water, 7);
+            resource = Resource(ResourceType::Water, 15);
         else if(mapResource > 0x40 && mapResource < 0x48)
             resource = Resource(ResourceType::Coal, mapResource - 0x40);
         else if(mapResource > 0x48 && mapResource < 0x50)
@@ -179,7 +179,7 @@ bool MapLoader::InitNodes(const libsiedler2::ArchivItem_Map& map, Exploration ex
         else if(mapResource > 0x58 && mapResource < 0x60)
             resource = Resource(ResourceType::Granite, mapResource - 0x58);
         else if(mapResource > 0x80 && mapResource < 0x90) // fish
-            resource = Resource(ResourceType::Fish, 4);   // Use 4 fish
+            resource = Resource(ResourceType::Fish, 15);   // Use 4 fish
         node.resources = resource;
 
         node.reserved = false;

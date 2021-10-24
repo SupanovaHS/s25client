@@ -91,6 +91,7 @@ void AIConstruction::ExecuteJobs(unsigned limit)
     unsigned i = 0; // count up to limit
     unsigned initconjobs = std::min<unsigned>(connectJobs.size(), 5);
     unsigned initbuildjobs = std::min<unsigned>(buildJobs.size(), 5);
+    auto buildingSitePlaced = 0;
     for(; i < limit && !connectJobs.empty() && i < initconjobs;
         i++) // go through list, until limit is reached or list empty or when every entry has been checked
     {
@@ -103,7 +104,9 @@ void AIConstruction::ExecuteJobs(unsigned limit)
             connectJobs.push_back(std::move(job));
         }
     }
-    for(; i < limit && !buildJobs.empty() && i < (initconjobs + initbuildjobs); i++)
+    // only place 5 buildings, so we can recalc our wanted buildings again, this should slow the AI down when it is allowed to expand
+  
+    for(; i < limit && !buildJobs.empty() && i < (initconjobs + initbuildjobs) && buildingSitePlaced < 5; i++)
     {
         auto job = GetBuildJob();
         job->ExecuteJob();
@@ -111,7 +114,8 @@ void AIConstruction::ExecuteJobs(unsigned limit)
            && job->GetState() != JobState::Failed) // couldnt do job? -> move to back of list
         {
             buildJobs.push_back(std::move(job));
-        }
+        } else
+            ++buildingSitePlaced;
     }
 }
 

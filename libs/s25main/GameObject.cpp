@@ -62,6 +62,11 @@ void GameObject::DetachWorld(GameWorld* gameWorld)
         world = nullptr;
 }
 
+GameWorld* GameObject::GetWorld()
+{
+    return world;
+}
+
 void GameObject::AttachWorld(GameWorld* gameWorld)
 {
     world = gameWorld;

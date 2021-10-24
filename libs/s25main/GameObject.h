@@ -51,6 +51,8 @@ private:
 
     // Static members
 public:
+    /// Get world pointer
+    static GameWorld* GetWorld();
     /// Set the currently active world for all game objects
     static void AttachWorld(GameWorld* gameWorld);
     /// Remove the world from all game objects

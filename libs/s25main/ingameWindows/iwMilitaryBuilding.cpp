@@ -198,6 +198,12 @@ void iwMilitaryBuilding::Msg_ButtonClick(const unsigned ctrl_id)
                 ++it;
                 if(it == militaryBuildings.end()) // was last entry in list -> goto first
                     it = militaryBuildings.begin();
+                while((*it)->GetBuildingType() != building->GetBuildingType())
+                {
+                    ++it;
+                    if(it == militaryBuildings.end()) // was last entry in list -> goto first
+                        it = militaryBuildings.begin();
+                }
                 gwv.MoveToMapPt((*it)->GetPos());
                 WINDOWMANAGER.ReplaceWindow(std::make_unique<iwMilitaryBuilding>(gwv, gcFactory, *it)).SetPos(GetPos());
                 break;

@@ -118,7 +118,7 @@ void nofFarmhand::HandleDerivedEvent(const unsigned /*id*/)
                                 available_points[GetPointQuality(t2)].push_back(MapPoint(t2));
                                 found_in_radius = true;
                                 points_found = true;
-                            } else if(job_ == Job::Stonemason)
+                            } else if(job_ == Job::Stonemason || job_ == Job::Woodcutter)
                             {
                                 // just wait a little bit longer
                                 wait = true;
@@ -174,6 +174,7 @@ void nofFarmhand::HandleDerivedEvent(const unsigned /*id*/)
                     case Job::Stonemason:
                     case Job::Fisher: workplace->OnOutOfResources(); break;
                     case Job::Woodcutter:
+                    //case Job::CharBurner: // useless charburner, delete
                         world->GetNotifications().publish(BuildingNote(
                           BuildingNote::NoRessources, player, workplace->GetPos(), workplace->GetBuildingType()));
                         break;
@@ -194,7 +195,7 @@ void nofFarmhand::HandleDerivedEvent(const unsigned /*id*/)
 bool nofFarmhand::IsPointAvailable(const MapPoint pt) const
 {
     // Gibts an diesen Punkt überhaupt die nötigen Vorraussetzungen für den Beruf?
-    if(GetPointQuality(pt) != PointQuality::NotPossible)
+     if(GetPointQuality(pt) != PointQuality::NotPossible)
     {
         // Gucken, ob ein Weg hinführt
         return world->FindHumanPath(this->pos, pt, 20) != boost::none;

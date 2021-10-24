@@ -132,7 +132,7 @@ nofFarmhand::PointQuality nofFarmer::GetPointQuality(const MapPoint pt) const
         }
 
         // Terrain untersuchen
-        if(!world->IsOfTerrain(pt, [](const auto& desc) { return desc.IsVital(); }))
+        if(!world->IsOfTerrain(pt, [](const auto& desc) { return desc.IsTreePlantable(); }))
             return PointQuality::NotPossible;
 
         // Ist Platz frei?

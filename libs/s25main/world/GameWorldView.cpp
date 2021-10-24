@@ -348,8 +348,11 @@ void GameWorldView::DrawNameProductivityOverlay(const TerrainRenderer& terrainRe
                 continue;
 
             // Is object not belonging to local player?
-            if(no->GetPlayer() != gwv.GetPlayerId())
-                continue;
+           if(gwv.GetWorld().GetGGS().isEnabled(AddonId::AI_DEBUG_WINDOW)== false)
+           {
+               if(no->GetPlayer() != gwv.GetPlayerId())
+                   continue;
+           }
 
             Position curPos = GetWorld().GetNodePos(pt) - offset + curOffset;
             curPos.y -= 22;

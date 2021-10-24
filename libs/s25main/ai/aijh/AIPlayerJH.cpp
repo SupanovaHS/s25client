@@ -2588,18 +2588,29 @@ void AIPlayerJH::AdjustSettings()
             return 0;
         };
         // Basic tools to produce stone, boards and iron are very important to have, do those first
-        for(const Tool tool : {Tool::Axe, Tool::Saw, Tool::PickAxe, Tool::Crucible})
+        for(const Tool tool : {Tool::Axe, Tool::Saw, Tool::PickAxe, Tool::Crucible,Tool::Hammer})
             toolsettings[tool] = calcToolPriority(tool);
         // Set some minima
         if(inventory[GoodType::Saw] + inventory[Job::Carpenter] < 2)
             toolsettings[Tool::Saw] = 10;
+        if(inventory[GoodType::Hammer] + inventory[Job::Builder] < 8)
+            toolsettings[Tool::Hammer] = 10;
         if(inventory[GoodType::Axe] + inventory[Job::Woodcutter] < 2)
             toolsettings[Tool::Axe] = 10;
+        // make sure basic food is covered
+        if(inventory[GoodType::RodAndLine] + inventory[Job::Fisher] < 4)
+            toolsettings[Tool::RodAndLine] = 10;
+        if(inventory[GoodType::Bow] + inventory[Job::Hunter] < 4)
+            toolsettings[Tool::Bow] = 10;
+
         if(inventory[GoodType::PickAxe] + inventory[Job::Stonemason] < 2)
             toolsettings[Tool::PickAxe] = 7;
+
+
         // Only if we haven't ordered any basic tool, we may order other tools
         if(toolsettings[Tool::Axe] == 0 && toolsettings[Tool::PickAxe] == 0 && toolsettings[Tool::Saw] == 0
-           && toolsettings[Tool::Crucible] == 0)
+           && toolsettings[Tool::Hammer] == 0
+           && toolsettings[Tool::Crucible] == 0 && toolsettings[Tool::Bow] == 0 && toolsettings[Tool::RodAndLine] == 0)
         {
             // Order those as required for existing and planned buildings
             for(const Tool tool : {Tool::Hammer, Tool::Scythe, Tool::Rollingpin, Tool::Shovel, Tool::Tongs,

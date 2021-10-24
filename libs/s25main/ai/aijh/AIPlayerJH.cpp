@@ -169,6 +169,8 @@ AIPlayerJH::AIPlayerJH(const unsigned char playerId, const GameWorldBase& gwb, c
 {
     InitNodes();
     InitResourceMaps();
+
+    
 #ifdef DEBUG_AI
     SaveResourceMapsToFile();
 #endif
@@ -212,6 +214,7 @@ AIPlayerJH::AIPlayerJH(const unsigned char playerId, const GameWorldBase& gwb, c
             HandleShipNote(eventManager, note);
     });
     subBQ = recordBQsToUpdate(this->gwb, this->nodesWithOutdatedBQ);
+
 }
 
 AIPlayerJH::~AIPlayerJH() = default;
@@ -239,7 +242,19 @@ void AIPlayerJH::RunGF(const unsigned gf, bool gfisnwf)
     if(gf == 100)
     {
         if(aii.GetMilitaryBuildings().empty() && aii.GetStorehouses().size() < 2)
-            aii.Chat(_("Hi, I'm an artifical player and I'm not very good yet!"));
+            aii.Chat(_("Hi, I'm an artificial player and I'm not very good, but I'm getting better!!!"));
+
+        /*// get HQ poistion and update borderlands resources
+        const auto& HQpos = aii.GetHeadquarter()->GetPos();
+
+        // try and look for mountain near by, and update borderlands accordingly to encourage the AI to take it asap
+        for(const auto& pt : aiMap.GetPointsInRadiusWithCenter(HQpos, 40))
+        {
+            if(gwb.IsOfTerrain(pt, [](const TerrainDesc& desc) { return desc.kind == TerrainKind::Mountain; }))
+                if(gwb.CalcDistance(HQpos, pt) < RES_RADIUS[AIResource::Borderland]) // find HQ pos near by
+                    resourceMaps[AIResource::Borderland].updateAround(pt, RES_RADIUS[AIResource::Borderland]);
+        }*/
+        
     }
 
     if(!nodesWithOutdatedBQ.empty())

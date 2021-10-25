@@ -205,8 +205,8 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     {
         buildingsWanted[BuildingType::Sawmill] = 1u;
         buildingsWanted[BuildingType::Forester] = 1u;
-        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 3u;
-        buildingsWanted[BuildingType::Quarry] = 1u;
+        buildingsWanted[BuildingType::Woodcutter] = 2u;
+        buildingsWanted[BuildingType::Quarry] = 0u;
         buildingsWanted[BuildingType::GraniteMine] = 0u;
         buildingsWanted[BuildingType::CoalMine] = 0u;
         buildingsWanted[BuildingType::IronMine] = 0u;
@@ -226,7 +226,17 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     {
         buildingsWanted[BuildingType::Ironsmelter] = 1u;
         buildingsWanted[BuildingType::Metalworks] = 1u;
-        buildingsWanted[BuildingType::Quarry] = 2u;
+        buildingsWanted[BuildingType::Quarry] = 1u;
+        buildingsWanted[BuildingType::Fishery] = 1u;
+        buildingsWanted[BuildingType::Hunter] = 1u;
+        return;
+    }
+
+
+    if(coalCount < 1 || ironCount < 1)
+    {
+        buildingsWanted[BuildingType::CoalMine] = 1u;
+        buildingsWanted[BuildingType::IronMine] = 1u;
         return;
     }
 
@@ -234,26 +244,13 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     {
         buildingsWanted[BuildingType::Sawmill] = 2u;
         buildingsWanted[BuildingType::Forester] =
-          std::max(buildingsWanted[BuildingType::Sawmill],GetNumBuildings(BuildingType::Sawmill)); // occasionally AI builds extra sawmills, which is fine, but
-                                                            // need extra foresters to supply wood
-        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 3u;
+          std::max(buildingsWanted[BuildingType::Sawmill], GetNumBuildings(BuildingType::Sawmill)); 
+        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 2u;
         buildingsWanted[BuildingType::Barracks] = 20u;
         return;
     }
 
-    if(militaryPower < 5)
-        return;
-
-    if(coalCount < 1 || ironCount < 1)
-    {
-        buildingsWanted[BuildingType::Fishery] = 2u;
-        buildingsWanted[BuildingType::Hunter] = 2u;
-        buildingsWanted[BuildingType::CoalMine] = 1u;
-        buildingsWanted[BuildingType::IronMine] = 1u;
-
-        return;
-    }
-    if(militaryPower < 8)
+    if(militaryPower < 4)
         return;
     
     if(sawmillCount < 3)
@@ -261,23 +258,23 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
         buildingsWanted[BuildingType::Sawmill] = 3u;
         buildingsWanted[BuildingType::Forester] =
           std::max(buildingsWanted[BuildingType::Sawmill], GetNumBuildings(BuildingType::Sawmill)); 
-        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 3u;
-        buildingsWanted[BuildingType::Quarry] = 3u;
-        buildingsWanted[BuildingType::Fishery] = 3u;
-        buildingsWanted[BuildingType::Hunter] = 3u;
+        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 2u;
+        buildingsWanted[BuildingType::Quarry] = 2u;
+        buildingsWanted[BuildingType::Fishery] = 2u;
+        buildingsWanted[BuildingType::Hunter] = 2u;
         buildingsWanted[BuildingType::GraniteMine] = 1u;
         buildingsWanted[BuildingType::GoldMine] = 1u;
         buildingsWanted[BuildingType::Mint] = 1u;
         return;
     }
   
-    if(militaryPower < 12)
+    if(militaryPower < 8)
         return;
     if(coalCount < 3 || ironCount < 2
        || ironsmelterCount < 2  || metalworksCount < 2 )
     {
-        buildingsWanted[BuildingType::Fishery] = 5u;
-        buildingsWanted[BuildingType::Hunter] = 5u;
+        buildingsWanted[BuildingType::Fishery] = 3u;
+        buildingsWanted[BuildingType::Hunter] = 3u;
         buildingsWanted[BuildingType::CoalMine] = 3u;
         buildingsWanted[BuildingType::IronMine] = 2u;
         buildingsWanted[BuildingType::Ironsmelter] = 2u;
@@ -297,9 +294,9 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
         buildingsWanted[BuildingType::Forester] =
           std::max(buildingsWanted[BuildingType::Sawmill], GetNumBuildings(BuildingType::Sawmill)); 
         buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 3u;
-        buildingsWanted[BuildingType::Quarry] = 4u;
-        buildingsWanted[BuildingType::Fishery] = 6u;
-        buildingsWanted[BuildingType::Hunter] = 6u;
+        buildingsWanted[BuildingType::Quarry] = 3u;
+        buildingsWanted[BuildingType::Fishery] = 4u;
+        buildingsWanted[BuildingType::Hunter] = 4u;
         buildingsWanted[BuildingType::GraniteMine] = 1u;
         return;
     }

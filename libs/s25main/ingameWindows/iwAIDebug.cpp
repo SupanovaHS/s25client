@@ -50,8 +50,9 @@ public:
     }
 
     const AIJH::AIPlayerJH* ai;
-    unsigned overlay;
 
+    unsigned overlay;
+    //GetDensity(around, AIResource::Plantspace, 10) > 55 && // make sure we got some space
     void onDraw(const MapPoint& pt, const DrawPoint& curPos) override
     {
         if(overlay == 0)
@@ -66,8 +67,19 @@ public:
         else if(overlay == 3)
             ticks[ai->GetAINode(pt).farmed]->DrawFull(curPos);
         else if(overlay < 13)
-            font.Draw(curPos, helpers::toString(ai->GetResMapValue(pt, AIResource(overlay - 4))), FontStyle{},
+            font.Draw(curPos,
+                      helpers::toString(ai->GetResMapValue(pt, AIResource(overlay - 4))),
+                      FontStyle{},
                       COLOR_YELLOW);
+        else
+        {
+            font.Draw(curPos,
+                      helpers::toString(ai->GetResMapValue(pt, AIResource(overlay - 13))) + " ("
+                        + helpers::toString(const_cast<AIJH::AIPlayerJH*>(ai)->GetDensity(
+                          pt, AIResource(overlay - 13), 4)) // show density around point
+                        + ")",
+                      FontStyle{}, COLOR_YELLOW);
+        }
     }
 };
 
@@ -110,7 +122,16 @@ iwAIDebug::iwAIDebug(GameWorldView& gwv, const std::vector<const AIPlayer*>& ais
     overlays->AddString("Wood");
     overlays->AddString("Stones");
     overlays->AddString("Plantspace");
-    overlays->AddString("Borderland");
+    overlays->AddString("Borderland"); // 12
+    overlays->AddString("Gold (Density)");
+    overlays->AddString("Ironore (Density)");
+    overlays->AddString("Coal (Density)");
+    overlays->AddString("Granite (Density)");
+    overlays->AddString("Fish (Density)");
+    overlays->AddString("Wood (Density)");
+    overlays->AddString("Stones (Density)");
+    overlays->AddString("Plantspace (Density)");
+    overlays->AddString("Borderland (Density)");
 
 
     // Show 7 lines of text and 1 empty line

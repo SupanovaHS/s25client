@@ -1020,7 +1020,10 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
                && !construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Charburner))
 
             {
-                if(aii.GetBuildings(BuildingType::Forester).size() < 3) // new game? place near a woodcutter
+                foundPos = FindBestPositionRanged(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, -200,
+                                                  10); // find any low wood values, and plug forester in here
+
+                if(!foundPos.isValid()) // failed? just place near any woodcutter then
                 {
                     // get our positions of buildings and sites
                     auto woodcutters = aii.GetBuildings(BuildingType::Woodcutter);
@@ -1044,13 +1047,21 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
                         std::advance(targetWoodcutter, rndWoodcutter);
 
                        // if(GetDensity(woodcutterPos, AIResource::Plantspace, 4) > 60) // make sure we got some space 
-                            foundPos = FindBestPosition((*targetWoodcutter), AIResource::Wood, BUILDING_SIZE[type], 4, 0);
+                             if(!construction->OtherUsualBuildingInRadius((*targetWoodcutter), 12, BuildingType::Forester) &&
+                           // GetDensity(around, AIResource::Wood, 3) > 15 && // make sure we got some wood near by
+                           // now make sure we not near a farm....
+                           !construction->OtherUsualBuildingInRadius(
+                             (*targetWoodcutter), 12,
+                             BuildingType::Farm) // not near farms or charburners plz
+                           && !construction->OtherUsualBuildingInRadius((*targetWoodcutter), 12,
+                                                                        BuildingType::Charburner))
+                            foundPos =
+                              FindBestPosition((*targetWoodcutter), AIResource::Wood, BUILDING_SIZE[type], 4, 0);
                     }
                 }
                     
-                else
-                    foundPos = FindBestPositionRanged(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, -200,
-                                                      10); // find any low wood values, and plug forester in here
+
+                   
             }
 
             break;

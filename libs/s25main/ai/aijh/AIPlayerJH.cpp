@@ -2377,17 +2377,22 @@ void AIPlayerJH::InitBuildOrders()
     moveTop(selection, buildOrders);
 
     // prioritize wood
+    selection = findIndexByType(BuildingType::Sawmill, buildOrders);
+    moveTop(selection, buildOrders);
     selection = findIndexByType(BuildingType::Forester, buildOrders);
     moveTop(selection, buildOrders);
     selection = findIndexByType(BuildingType::Woodcutter, buildOrders);
     moveTop(selection, buildOrders);
-    selection = findIndexByType(BuildingType::Sawmill, buildOrders);
-    moveTop(selection, buildOrders);
+
 
     // lower gold and granite for now
     selection = findIndexByType(BuildingType::GoldMine, buildOrders);
     moveBottom(selection, buildOrders);
     selection = findIndexByType(BuildingType::GraniteMine, buildOrders);
+    moveBottom(selection, buildOrders);
+
+    //lower fortress
+    selection = findIndexByType(BuildingType::Fortress, buildOrders);
     moveBottom(selection, buildOrders);
 
     // set use build order flag

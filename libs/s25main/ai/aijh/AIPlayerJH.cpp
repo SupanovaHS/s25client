@@ -335,14 +335,14 @@ void AIPlayerJH::PlanNewBuildings(const unsigned gf)
 
     // pick a random storehouse and try to build one of these buildings around it (checks if we actually want more of
     // the building type)
-    std::array<BuildingType, 26> bldToTest = {
+    std::array<BuildingType, 25> bldToTest = {
       {BuildingType::HarborBuilding, BuildingType::Shipyard, BuildingType::Sawmill,        BuildingType::Forester,
        BuildingType::Farm,           BuildingType::Fishery,  BuildingType::Woodcutter,     BuildingType::Quarry,
        BuildingType::GoldMine,       BuildingType::Well,     BuildingType::IronMine,       BuildingType::CoalMine,
        BuildingType::GraniteMine,    BuildingType::Hunter,   BuildingType::Charburner,     BuildingType::Ironsmelter,
        BuildingType::Mint,           BuildingType::Armory,   BuildingType::Metalworks,     BuildingType::Brewery,
        BuildingType::Mill,           BuildingType::PigFarm,  BuildingType::Slaughterhouse, BuildingType::Bakery,
-       BuildingType::DonkeyBreeder,  BuildingType::Barracks}};
+       BuildingType::DonkeyBreeder}};
     const unsigned numResGatherBlds = 15; /* The first n buildings in the above list, that gather resources */
 
     // LOG.write(("new buildorders %i whs and %i mil for player %i
@@ -397,7 +397,10 @@ void AIPlayerJH::PlanNewBuildings(const unsigned gf)
             AddBuildJobAroundEveryMilBld(bldToTest[i]);
         }
     }
-    AddMilitaryBuildJob(bldPos);
+
+    if(gf > 1500 || aii.GetInventory().goods[GoodType::Boards] > 11)
+        AddMilitaryBuildJob(bldPos);
+
     if((*it2)->IsUseless() && (*it2)->IsDemolitionAllowed() && randomMiliBld != UpdateUpgradeBuilding())
     {
         aii.DestroyBuilding(bldPos);

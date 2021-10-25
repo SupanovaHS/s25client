@@ -246,6 +246,8 @@ bool AIConstruction::MilitaryBuildingWantsRoad(const nobMilitary& milbld)
     if(aijh.UpgradeBldPos
        == milbld.GetPos()) // upgrade bld should have road already but just in case it doesnt -> get a road asap
         return true;
+    if(milbld.GetNumTroops() == 0) // empty building?
+        return true;
     // TODO: This probably does not do what is wanted...
     int bldIdx = helpers::indexOf(aii.GetMilitaryBuildings(), &milbld);
     return bldIdx

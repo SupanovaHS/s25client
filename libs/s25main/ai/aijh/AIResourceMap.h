@@ -28,6 +28,10 @@ public:
     /// satisfying the minimum value, returns false if no such position is found
     MapPoint findBestPosition(const MapPoint& pt, BuildingQuality size, unsigned radius, int minimum) const;
 
+    /// Finds the best position for a specific resource in an area using the resource maps,
+    /// value returned should be within range specified
+    MapPoint findBestPositionRanged(const MapPoint& pt, BuildingQuality size, unsigned radius, int minimum,int maximum) const;
+
     /// Marks a position to be avoided.
     /// Only has an effect on diminishable resources where this blocks this point forever
     void avoidPosition(const MapPoint& pt);

@@ -722,6 +722,29 @@ MapPoint AIPlayerJH::FindBestPosition(const MapPoint& pt, AIResource res, Buildi
     
 }
 
+MapPoint AIPlayerJH::FindBestPositionRanged(const MapPoint& pt, AIResource res, BuildingQuality size, unsigned radius,
+    int minimum, int maximum)
+{
+    resourceMaps[res].updateAround(pt, radius);
+
+    if(res != AIResource::Fish)
+        return resourceMaps[res].findBestPositionRanged(pt, size, radius, minimum,maximum);
+
+    // find water with fish
+    const auto& waterpt = resourceMaps[res].findBestPositionRanged(pt, size, radius, minimum, maximum);
+
+    // waterpt is water, not a building site, so now we need to find a building site near by
+    // validate point
+    if(waterpt.isValid())
+    {
+        // initialize map
+        resourceMaps[AIResource::Plantspace].updateAround(waterpt, radius);
+        // get spot
+        return resourceMaps[AIResource::Plantspace].findBestPositionRanged(waterpt, size, 5, minimum, maximum);
+    }
+    return waterpt;
+}
+
 void AIPlayerJH::ExecuteAIJob()
 {
     // Check whether current job is finished...
@@ -981,17 +1004,52 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
     {
         case BuildingType::Woodcutter:
         {
-            foundPos = FindBestPosition(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, 150);
+            foundPos = FindBestPosition(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, 100);
             break;
         }
         case BuildingType::Forester:
-            // ensure some distance to other foresters and an minimal amount of plantspace
-            if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester)
-               && GetDensity(around, AIResource::Plantspace, 7) > 15)
-                // now make sure we not near a farm....
-                if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Farm) // not near farms or charburners plz
-                   && !construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Charburner))
-                    foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 0);
+            // ensure some distance to other foresters
+            if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester) &&
+               // GetDensity(around, AIResource::Wood, 3) > 15 && // make sure we got some wood near by
+               // now make sure we not near a farm....
+               !construction->OtherUsualBuildingInRadius(around, 12,
+                                                         BuildingType::Farm) // not near farms or charburners plz
+               && !construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Charburner))
+
+            {
+                if(aii.GetBuildings(BuildingType::Forester).size() < 3) // new game? place near a woodcutter
+                {
+                    // get our positions of buildings and sites
+                    auto woodcutters = aii.GetBuildings(BuildingType::Woodcutter);
+                    const auto& bldSites = aii.GetBuildingSites();
+
+                    std::vector<MapPoint> positions;
+                    for(const auto& site:bldSites)
+                    {
+                        positions.push_back(site->GetPos());
+                    }
+                     for(const auto& woodcutter : woodcutters)
+                    {
+                         positions.push_back(woodcutter->GetPos());
+                    }
+
+                    if(!positions.empty())
+                    {
+                        // grab a random woodcutter
+                        int rndWoodcutter = rand() % positions.size();
+                        auto targetWoodcutter = positions.begin();
+                        std::advance(targetWoodcutter, rndWoodcutter);
+
+                       // if(GetDensity(woodcutterPos, AIResource::Plantspace, 4) > 60) // make sure we got some space 
+                            foundPos = FindBestPosition((*targetWoodcutter), AIResource::Wood, BUILDING_SIZE[type], 4, 0);
+                    }
+                }
+                    
+                else
+                    foundPos = FindBestPositionRanged(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, -200,
+                                                      10); // find any low wood values, and plug forester in here
+            }
+
             break;
         case BuildingType::Hunter:
         {
@@ -1060,15 +1118,17 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
                 foundPos = MapPoint::Invalid();
             break;
         case BuildingType::Farm:
-            if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester))  // check no forester near by
-            foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);
+            if(!construction->OtherUsualBuildingInRadius(around, 12,
+                                                         BuildingType::Forester)) // check no forester near by
+                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);
             /*if(foundPos.isValid())
                 foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);*/
             break;
         case BuildingType::Charburner:
             if(!construction->OtherUsualBuildingInRadius(around, 12,
                                                          BuildingType::Forester)) // check no forester near by
-                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 100); // large space needed
+                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius,
+                                            100); // large space needed
             break;
         case BuildingType::Catapult:
             foundPos = SimpleFindPosition(around, BUILDING_SIZE[type], searchRadius);
@@ -1083,6 +1143,8 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
 unsigned AIPlayerJH::GetDensity(MapPoint pt, AIResource res, int radius)
 {
     RTTR_Assert(pt.x < aiMap.GetWidth() && pt.y < aiMap.GetHeight());
+
+    resourceMaps[res].updateAround(pt, radius); // don't forget to update our map first
 
     std::vector<MapPoint> pts = gwb.GetPointsInRadius(pt, radius);
     const unsigned numAllPTs = pts.size();
@@ -2642,7 +2704,7 @@ void AIPlayerJH::AdjustSettings()
             }
         }
 
-        // set default buildorders after we have at lease 1 iron and 1 coal mine built
+        // set default buildorders after we have at least 1 iron and 1 coal mine built
         if(!aii.GetBuildings(BuildingType::IronMine).empty() && !aii.GetBuildings(BuildingType::CoalMine).empty())
         {
             aii.ChangeBuildOrder(false, BuildOrders()); // set to default

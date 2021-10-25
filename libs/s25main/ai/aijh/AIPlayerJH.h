@@ -136,6 +136,8 @@ public:
     /// satisfying the minimum value, returns false if no such position is found
     MapPoint FindBestPosition(const MapPoint& pt, AIResource res, BuildingQuality size, unsigned radius,
                               int minimum = 1);
+    MapPoint FindBestPositionRanged(const MapPoint& pt, AIResource res, BuildingQuality size, unsigned radius,
+                              int minimum = 1 , int maximum = 1);
     /// Finds a position for the desired building size
     MapPoint SimpleFindPosition(const MapPoint& pt, BuildingQuality size, unsigned radius) const;
     /// Find a position for a specific building around a given point

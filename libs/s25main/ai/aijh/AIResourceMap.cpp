@@ -112,6 +112,68 @@ MapPoint AIResourceMap::findBestPosition(const MapPoint& pt, BuildingQuality siz
     return best;
 }
 
+MapPoint AIResourceMap::findBestPositionRanged(const MapPoint& pt, BuildingQuality size, unsigned radius, int minimum,
+    int maximum) const
+{
+    MapPoint best = MapPoint::Invalid();
+    int targetValue = 0;
+    if(minimum > maximum)
+    {
+        // swap min max
+        int tmpMin = minimum;
+        maximum = minimum;
+        minimum = tmpMin;
+    }
+    if(minimum == maximum)
+        targetValue = minimum;
+
+    if(minimum != maximum)
+    {
+        targetValue = minimum + ((maximum - minimum) / 2);
+    }
+
+    int diff = maximum;
+    std::vector<MapPoint> pts = aii.gwb.GetPointsInRadiusWithCenter(pt, radius);
+    for(const MapPoint& curPt : pts)
+    {
+        const unsigned idx = map.GetIdx(curPt);
+        if(map[idx] >= minimum && map[idx] <= maximum)
+        {
+
+            if(res == AIResource::Fish) // fish ignore building site checks since it needs to find land to build on near
+                                        // by, this only returns water which cant be built on
+            {
+                // check fishery near by
+                if(aii.isBuildingNearby(BuildingType::Fishery, curPt, 10))
+                    continue;
+            } else
+            {
+                if(map[idx] == targetValue || abs(map[idx] - targetValue) < diff)
+                {
+                    // check position validity
+                    if(!aiMap[idx].reachable || !aiMap[idx].owned || aiMap[idx].farmed)
+                        continue;
+                    RTTR_Assert(aii.GetBuildingQuality(curPt)
+                                == aiMap[curPt].bq); // Temporary, to check if aiMap is correctly update, see below
+                    if(!canUseBq(aii.GetBuildingQuality(curPt), size)) // map[idx].bq; TODO: Update nodes BQ and use that
+                        continue;
+                    if(res == AIResource::Borderland && aii.gwb.IsOnRoad(aii.gwb.GetNeighbour(curPt, Direction::SouthEast)))
+                        continue;
+                    // dont build next to empty harborspots
+                    if(aii.isHarborPosClose(curPt, 2, true))
+                        continue;
+
+                    best = curPt;
+                    diff = abs(map[idx] - targetValue);
+                }
+            }
+            
+        }
+    }
+
+    return best;
+}
+
 void AIResourceMap::avoidPosition(const MapPoint& pt)
 {
     map[pt] = 0;

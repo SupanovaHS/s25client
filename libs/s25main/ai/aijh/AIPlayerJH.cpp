@@ -2710,8 +2710,8 @@ void AIPlayerJH::AdjustSettings()
             }
         }
 
-        // set default buildorders after we have at least 1 iron and 1 coal mine built
-        if(!aii.GetBuildings(BuildingType::IronMine).empty() && !aii.GetBuildings(BuildingType::CoalMine).empty())
+        // set default buildorders after we have at least 3 sawmills
+        if(aii.GetBuildings(BuildingType::Sawmill).size() > 3)
         {
             aii.ChangeBuildOrder(false, BuildOrders()); // set to default
         }

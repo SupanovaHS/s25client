@@ -59,10 +59,13 @@ void AIConstruction::AddBuildJob(std::unique_ptr<BuildJob> job, bool front)
         bool alreadyinlist = false;
         for(auto& buildJob : buildJobs)
         {
-            if(buildJob->GetType() == job->GetType() && buildJob->GetAround() == job->GetAround())
+            if(buildJob->GetType() == job->GetType())
             {
-                alreadyinlist = true;
-                break;
+                if(buildJob->GetType() == BuildingType::Sawmill) // 1 sawmill at a time please
+                {
+                    alreadyinlist = true;
+                    break;
+                }
             }
         }
         if(!alreadyinlist)
@@ -91,7 +94,7 @@ void AIConstruction::ExecuteJobs(unsigned limit)
     unsigned i = 0; // count up to limit
     unsigned initconjobs = std::min<unsigned>(connectJobs.size(), 5);
     unsigned initbuildjobs = std::min<unsigned>(buildJobs.size(), 5);
-    auto buildingSitePlaced = 0;
+
     for(; i < limit && !connectJobs.empty() && i < initconjobs;
         i++) // go through list, until limit is reached or list empty or when every entry has been checked
     {
@@ -104,18 +107,15 @@ void AIConstruction::ExecuteJobs(unsigned limit)
             connectJobs.push_back(std::move(job));
         }
     }
-    // only place 5 buildings, so we can recalc our wanted buildings again, this should slow the AI down when it is allowed to expand
   
-    for(; i < limit && !buildJobs.empty() && i < (initconjobs + initbuildjobs) && buildingSitePlaced < 5; i++)
+    for(; i < limit && !buildJobs.empty() && i < initconjobs + initbuildjobs; i++)
     {
         auto job = GetBuildJob();
         job->ExecuteJob();
         if(job->GetState() != JobState::Finished
            && job->GetState() != JobState::Failed) // couldnt do job? -> move to back of list
-        {
             buildJobs.push_back(std::move(job));
-        } else
-            ++buildingSitePlaced;
+        
     }
 }
 
@@ -476,6 +476,10 @@ helpers::OptionalEnum<BuildingType> AIConstruction::ChooseMilitaryBuilding(const
     const BuildingType biggestBld = GetBiggestAllowedMilBuilding().value();
 
     const Inventory& inventory = aii.GetInventory();
+
+    // no sawmill? run
+    if(aii.GetBuildings(BuildingType::Sawmill).empty())
+        return boost::none;
 
     // make sure 3 sawmills up
     if(((rand() % 3) == 0 || inventory.people[Job::Private] < 15) && (inventory.goods[GoodType::Stones] > 6 || bldPlanner.GetNumBuildings(BuildingType::Quarry) > 0))

@@ -710,7 +710,11 @@ void GamePlayer::AddJobWanted(const Job job, noRoadNode* workplace)
     {
         JobNeeded jn = {job, workplace};
         jobs_wanted.push_back(jn);
+
+        // sort order of jobs
+        SortJobsWanted();
     }
+   
 }
 
 void GamePlayer::JobNotWanted(noRoadNode* workplace, bool all)

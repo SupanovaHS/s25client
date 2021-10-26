@@ -144,17 +144,7 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
 
     const unsigned& militaryPower = std::min(occupiedMilitary, numSoldiers);
 
-    int foresterCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Forester).size();
-    int sawmillCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Sawmill).size();
-    // mines
-    int graniteCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::GraniteMine).size();
-    int ironCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::IronMine).size();
-    int coalCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::CoalMine).size();
-
-    int ironsmelterCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Ironsmelter).size();
-    int metalworksCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Metalworks).size();
-
-    int farmCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Farm).size();
+   
 
     // we can also check building sites, and if all resources are either waiting to be built OR en-route, consider that
     // as complete to move on to next stage
@@ -162,37 +152,40 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     std::array<BuildingType, 8> bldSites = {{BuildingType::Sawmill, BuildingType::GraniteMine, BuildingType::IronMine,
                                              BuildingType::CoalMine, BuildingType::Ironsmelter,
                                              BuildingType::Metalworks, BuildingType::Farm, BuildingType::Forester}};
-
+    helpers::EnumArray<unsigned, BuildingType> bldCount{};
     for(const auto site : buildingSites)
     {
-        for(const auto& type : bldSites)
-        {
-            if(site->GetBuildingType() == type)
-            {
-                // get resources used, waiting and en-route
-                const auto& totalBoards = site->getBoards() + site->getUsedBoards() + site->getOrderedBoards().size();
-                const auto& totalStone = site->getStones() + site->getUsedStones() + site->getOrderedStones().size();
+        const auto type = site->GetBuildingType();
+        if(!helpers::contains(bldSites, type)) 
+            continue;
+        // get resources used, waiting and en-route
+        const auto& totalBoards = site->getBoards() + site->getUsedBoards() + site->getOrderedBoards().size();
+        const auto& totalStone = site->getStones() + site->getUsedStones() + site->getOrderedStones().size();
 
-                if(totalBoards == BUILDING_COSTS[type].boards && totalStone == BUILDING_COSTS[type].stones)
-                {
-                    // nasty switch
-                    switch(type)
-                    {
-                        case BuildingType::Forester: ++foresterCount; break;
-                        case BuildingType::Sawmill: ++sawmillCount; break;
-                        case BuildingType::GraniteMine: ++graniteCount; break;
-                        case BuildingType::IronMine: ++ironCount; break;
-                        case BuildingType::CoalMine: ++coalCount; break;
-                        case BuildingType::Ironsmelter: ++ironsmelterCount; break;
-                        case BuildingType::Metalworks: ++metalworksCount; break;
-                        default: ++farmCount; break; // must be farm
-                    }
-                }
-            }
-        }
+        if(totalBoards == BUILDING_COSTS[type].boards && totalStone == BUILDING_COSTS[type].stones)      
+            ++bldCount[type];
     }
 
-  
+    
+    const auto& foresterCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Forester).size() + bldCount[BuildingType::Forester];
+    const auto& sawmillCount =
+      aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Sawmill).size() + bldCount[BuildingType::Sawmill];
+    // mines
+    const auto& graniteCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::GraniteMine).size()
+                               + bldCount[BuildingType::GraniteMine];
+    const auto& ironCount =
+      aijh.player.GetBuildingRegister().GetBuildings(BuildingType::IronMine).size() + bldCount[BuildingType::IronMine];
+    const auto& coalCount =
+      aijh.player.GetBuildingRegister().GetBuildings(BuildingType::CoalMine).size() + bldCount[BuildingType::CoalMine];
+
+    const auto& ironsmelterCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Ironsmelter).size()
+                                  + bldCount[BuildingType::Ironsmelter];
+    const auto& metalworksCount = aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Metalworks).size()
+                                   + bldCount[BuildingType::Metalworks];
+
+    const auto& farmCount =
+     aijh.player.GetBuildingRegister().GetBuildings(BuildingType::Farm).size() + bldCount[BuildingType::Farm];
+    
 
     /*const auto calcFarmsWanted = [](const unsigned pigFarms, const unsigned mills, const unsigned donkeyFarms,
                                     const unsigned charBurners, const unsigned brewery) {
@@ -361,6 +354,9 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
 
 
     return;
+
+    // older "script" no longer used below
+
 
     // at least some expansion happened -> more buildings wanted
     // building wanted usually limited by profession workers+tool for profession with some arbitrary limit. Some

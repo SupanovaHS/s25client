@@ -139,6 +139,11 @@ void BuildingRegister::MoveDown(noBuildingSite* building_site)
     }
 }
 
+const std::list<nobUsual*>& BuildingRegister::GetAllBuildings(BuildingType type) const
+{
+    return buildings[type];
+}
+
 /// Gibt Liste von Gebäuden des Spieler zurück
 const std::list<nobUsual*>& BuildingRegister::GetBuildings(const BuildingType type) const
 {

@@ -870,8 +870,6 @@ void GamePlayer::SortJobsWanted()
 
     for(const auto& job : others)
         jobs_wanted.push_back(job);
-
-    int foo = 0;
 }
 
 Ware* GamePlayer::OrderWare(const GoodType ware, noBaseBuilding* goal)

@@ -817,6 +817,63 @@ void GamePlayer::FindWarehouseForAllJobs(const Job job)
     }
 }
 
+void GamePlayer::SortJobsWanted()
+{
+    if(useCustomBuildOrder_ == false)
+        return; // nothing to do here
+
+    if(jobs_wanted.empty())
+        return; // nothing to do here
+
+    // Ok so, using custom build orders is nice BUT, issues start to arise with builders.
+    // builders do not check which building it should be going to first based on the build orders position.
+
+    // and yea, there will be a much better way to do all this, but it's more a proof of concept, probably a helper for this...
+    //
+    // find all our builder jobs
+
+    std::vector<JobNeeded> builders; // list of building jobs
+    std::vector<JobNeeded> others; // contains the rest.
+
+    for(const auto& job : jobs_wanted)
+    {
+        if(job.job == Job::Builder)
+            builders.push_back(job);
+        else
+            others.push_back(job);
+    }
+
+    if(builders.empty()) // no builder jobs?
+        return;  //nothing more to do
+
+    std::vector<JobNeeded> sortedBuilders;
+    // now we can sort the builders based on the build orders
+    for(const auto& bldType : build_order)
+    {
+        for(const auto &bldJob : builders)
+        {
+            // cast to building site
+            const auto& bldSite = checkedCast<noBuildingSite*>(bldJob.workplace);
+            // check type
+            if(bldSite->GetBuildingType() == bldType)
+            {
+                sortedBuilders.push_back(bldJob);
+            }
+        }
+    }
+
+    // builders sorted, bring both lists together in jobs_wanted
+    jobs_wanted.clear();
+
+    for(const auto& job : builders)
+        jobs_wanted.push_back(job);
+
+    for(const auto& job : others)
+        jobs_wanted.push_back(job);
+
+    int foo = 0;
+}
+
 Ware* GamePlayer::OrderWare(const GoodType ware, noBaseBuilding* goal)
 {
     /// Gibt es ein Lagerhaus mit dieser Ware?

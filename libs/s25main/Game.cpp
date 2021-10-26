@@ -84,6 +84,7 @@ void Game::RunGF()
             // Auf Notfall testen (Wenige Bretter/Steine und keine Holzindustrie)
             player.TestForEmergencyProgramm();
             player.TestPacts();
+            player.SortJobsWanted();
         }
     }
 

@@ -131,6 +131,8 @@ public:
     /// Versucht für alle Arbeitsplätze eine Arbeitskraft zu suchen
     void FindWarehouseForAllJobs();
     void FindWarehouseForAllJobs(Job job);
+    //reorder jobs wanted based on build order
+    void SortJobsWanted();
 
     /// Lässt alle Baustellen ggf. noch vorhandenes Baumaterial bestellen
     void FindMaterialForBuildingSites();

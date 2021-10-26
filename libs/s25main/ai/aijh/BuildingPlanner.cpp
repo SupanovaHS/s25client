@@ -139,7 +139,7 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     unsigned occupiedMilitary = 0;
     for(const auto& mil : aijh.player.GetBuildingRegister().GetMilitaryBuildings())
     {
-        occupiedMilitary += mil->GetNumTroops();
+        occupiedMilitary += (mil->GetNumTroops()) ? 1 : 0; // only increase if occupied, don't count all occupants
     }
 
     const unsigned& militaryPower = std::min(occupiedMilitary, numSoldiers);

@@ -2037,7 +2037,11 @@ void AIPlayerJH::CheckForUnconnectedBuildingSites()
 {
    // if(construction->GetConnectJobNum() > 0 || construction->GetBuildJobNum() > 0)
        // return;
-    for(noBuildingSite* bldSite : player.GetBuildingRegister().GetBuildingSites()) //-V807
+
+   
+    auto buildingSites = player.GetBuildingRegister().GetBuildingSites();
+
+   for(noBuildingSite* bldSite : buildingSites) //-V807
     {
         noFlag* flag = bldSite->GetFlag();
         bool foundRoute = false;
@@ -2088,7 +2092,7 @@ void AIPlayerJH::CheckForUnconnectedBuildings()
   
     for(const auto type : helpers::EnumRange<BuildingType>{}) // performance?????
     {       
-        auto bldList = player.GetBuildingRegister().GetBuildings(type);
+        auto bldList = player.GetBuildingRegister().GetAllBuildings(type);
         if(!bldList.empty())
         {
             int randombld = rand() % (bldList.size());
@@ -2101,6 +2105,9 @@ void AIPlayerJH::CheckForUnconnectedBuildings()
                 if(construction->IsConnectedToRoadSystem(bld->GetFlag()) == false)
                 {
                     construction->AddConnectFlagJob(bld->GetFlag());
+                } else
+                {
+                    RemoveAllUnusedRoads(bld->GetPos());
                 }
                 ++it;
                 if(it == bldList.end()) // wrap around

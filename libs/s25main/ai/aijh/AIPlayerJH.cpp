@@ -2374,6 +2374,10 @@ void AIPlayerJH::InitBuildOrders()
     selection = findIndexByType(BuildingType::Ironsmelter, buildOrders);
     moveTop(selection, buildOrders);
 
+    // stone
+    selection = findIndexByType(BuildingType::Quarry, buildOrders);
+    moveTop(selection, buildOrders);
+
     // prioritize wood
     selection = findIndexByType(BuildingType::Sawmill, buildOrders);
     moveTop(selection, buildOrders);

@@ -869,7 +869,7 @@ void GamePlayer::SortJobsWanted()
     // builders sorted, bring both lists together in jobs_wanted
     jobs_wanted.clear();
 
-    for(const auto& job : builders)
+    for(const auto& job : sortedBuilders)
         jobs_wanted.push_back(job);
 
     for(const auto& job : others)

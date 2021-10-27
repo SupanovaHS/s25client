@@ -2676,16 +2676,27 @@ void AIPlayerJH::AdjustSettings()
             toolsettings[tool] = calcToolPriority(tool);
 
         // Set some minimal
-        if(inventory[GoodType::Saw] + inventory[Job::Carpenter] < 3)
+        if(inventory[GoodType::Saw] + inventory[Job::Carpenter] < 2)
             toolsettings[Tool::Saw] = 8;
-        if(inventory[GoodType::Axe] + inventory[Job::Woodcutter] < 6)
-            toolsettings[Tool::Axe] = 6;
-        if(inventory[GoodType::Shovel] + inventory[Job::Forester] < 3)
-            toolsettings[Tool::Shovel] = 10;
-        if(inventory[GoodType::PickAxe] + inventory[Job::Miner] < 5)
-            toolsettings[Tool::PickAxe] = 4;
-        if(inventory[GoodType::Hammer] + inventory[Job::Builder] < 15)
-            toolsettings[Tool::Hammer] = 7;
+        if(inventory[GoodType::Axe] + inventory[Job::Woodcutter] < 4)
+            toolsettings[Tool::Axe] = 10;
+        if(inventory[GoodType::Shovel] + inventory[Job::Forester] < 2)
+            toolsettings[Tool::Shovel] = 9;
+
+        if(toolsettings[Tool::Axe] == 0 && toolsettings[Tool::Saw] == 0 && toolsettings[Tool::Shovel] == 0) // get wood tools first
+        {
+            if(inventory[GoodType::Saw] + inventory[Job::Carpenter] < 3)
+                toolsettings[Tool::Saw] = 8;
+            if(inventory[GoodType::Axe] + inventory[Job::Woodcutter] < 6)
+                toolsettings[Tool::Axe] = 10;
+            if(inventory[GoodType::Shovel] + inventory[Job::Forester] < 3)
+                toolsettings[Tool::Shovel] = 9;
+            if(inventory[GoodType::PickAxe] + inventory[Job::Miner] < 5)
+                toolsettings[Tool::PickAxe] = 6;
+            if(inventory[GoodType::Hammer] + inventory[Job::Builder] < 15)
+                toolsettings[Tool::Hammer] = 7;
+        }
+
         // Only if we haven't ordered any basic tool, we may order other tools
         if(toolsettings[Tool::Axe] == 0 && toolsettings[Tool::Saw] == 0 && toolsettings[Tool::Shovel] == 0
            && toolsettings[Tool::PickAxe] == 0 && toolsettings[Tool::Hammer] == 0)

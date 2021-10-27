@@ -1012,57 +1012,53 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
         }
         case BuildingType::Forester:
             // ensure some distance to other foresters
-            if(!construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Forester) &&
+            if(!construction->OtherUsualBuildingInRadius(around, 6, BuildingType::Forester) &&
                // GetDensity(around, AIResource::Wood, 3) > 15 && // make sure we got some wood near by
                // now make sure we not near a farm....
-               !construction->OtherUsualBuildingInRadius(around, 12,
+               !construction->OtherUsualBuildingInRadius(around, 6,
                                                          BuildingType::Farm) // not near farms or charburners plz
-               && !construction->OtherUsualBuildingInRadius(around, 12, BuildingType::Charburner))
+               && !construction->OtherUsualBuildingInRadius(around, 6,BuildingType::Charburner))
 
-            {
+            
                 foundPos = FindBestPositionRanged(around, AIResource::Wood, BUILDING_SIZE[type], searchRadius, -200,
                                                   10); // find any low wood values, and plug forester in here
 
-                if(!foundPos.isValid()) // failed? just place near any woodcutter then
+            if(!foundPos.isValid()) // failed? just place near any woodcutter then
+            {
+                // get our positions of buildings and sites
+                auto woodcutters = aii.GetBuildings(BuildingType::Woodcutter);
+                const auto& bldSites = aii.GetBuildingSites();
+
+                std::vector<MapPoint> positions;
+                for(const auto& site : bldSites)
                 {
-                    // get our positions of buildings and sites
-                    auto woodcutters = aii.GetBuildings(BuildingType::Woodcutter);
-                    const auto& bldSites = aii.GetBuildingSites();
+                    positions.push_back(site->GetPos());
+                }
+                for(const auto& woodcutter : woodcutters)
+                {
+                    positions.push_back(woodcutter->GetPos());
+                }
 
-                    std::vector<MapPoint> positions;
-                    for(const auto& site:bldSites)
+                if(!positions.empty())
+                {
+                    for(const auto& tgtWoodcutter : positions)
                     {
-                        positions.push_back(site->GetPos());
-                    }
-                     for(const auto& woodcutter : woodcutters)
-                    {
-                         positions.push_back(woodcutter->GetPos());
-                    }
-
-                    if(!positions.empty())
-                    {
-                        // grab a random woodcutter
-                        int rndWoodcutter = rand() % positions.size();
-                        auto targetWoodcutter = positions.begin();
-                        std::advance(targetWoodcutter, rndWoodcutter);
-
-                       // if(GetDensity(woodcutterPos, AIResource::Plantspace, 4) > 60) // make sure we got some space 
-                             if(!construction->OtherUsualBuildingInRadius((*targetWoodcutter), 12, BuildingType::Forester) &&
-                           // GetDensity(around, AIResource::Wood, 3) > 15 && // make sure we got some wood near by
-                           // now make sure we not near a farm....
-                           !construction->OtherUsualBuildingInRadius(
-                             (*targetWoodcutter), 12,
-                             BuildingType::Farm) // not near farms or charburners plz
-                           && !construction->OtherUsualBuildingInRadius((*targetWoodcutter), 12,
-                                                                        BuildingType::Charburner))
-                            foundPos =
-                              FindBestPosition((*targetWoodcutter), AIResource::Wood, BUILDING_SIZE[type], 4, 0);
+                        // if(GetDensity(woodcutterPos, AIResource::Plantspace, 4) > 60) // make sure we got some
+                        // space
+                        if(!construction->OtherUsualBuildingInRadius(tgtWoodcutter, 6, BuildingType::Forester)
+                           && !construction->OtherUsualBuildingInRadius(
+                             tgtWoodcutter, 6, BuildingType::Farm) // not near farms or charburners plz
+                           && !construction->OtherUsualBuildingInRadius(tgtWoodcutter, 6, BuildingType::Charburner))
+                            foundPos = FindBestPosition(tgtWoodcutter, AIResource::Wood, BUILDING_SIZE[type], 4, 0);
+                        if(foundPos.isValid())
+                            break;
                     }
                 }
+            }
                     
 
                    
-            }
+            
 
             break;
         case BuildingType::Hunter:

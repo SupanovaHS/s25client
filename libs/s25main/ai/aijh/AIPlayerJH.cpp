@@ -1326,12 +1326,7 @@ void AIPlayerJH::HandleBuildingFinished(const MapPoint pt, BuildingType bld)
         case BuildingType::Shipyard: aii.SetShipYardMode(pt, true); break;
 
         case BuildingType::Storehouse: break;
-        case BuildingType::Woodcutter:
-        {
-            if(construction->Wanted(BuildingType::Sawmill) == true)
-                AddBuildJob(BuildingType::Sawmill, pt); // only add if wanted (stops 30 sawmills being ordered....)
-            break;
-        }
+        
         default: break;
     }
 }

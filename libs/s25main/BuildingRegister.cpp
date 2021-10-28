@@ -139,7 +139,7 @@ void BuildingRegister::MoveDown(noBuildingSite* building_site)
     }
 }
 
-const std::list<nobUsual*>& BuildingRegister::GetAllBuildings(BuildingType type) const
+const std::list<nobUsual*>& BuildingRegister::GetAllBuildingsType(BuildingType type) const
 {
     return buildings[type];
 }

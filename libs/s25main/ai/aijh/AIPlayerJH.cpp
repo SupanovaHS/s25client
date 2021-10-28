@@ -2079,7 +2079,7 @@ void AIPlayerJH::CheckForUnconnectedBuildings()
   
     for(const auto type : helpers::EnumRange<BuildingType>{}) // performance?????
     {       
-        auto bldList = player.GetBuildingRegister().GetAllBuildings(type);
+        auto bldList = player.GetBuildingRegister().GetAllBuildingsType(type);
         if(!bldList.empty())
         {
             int randombld = rand() % (bldList.size());
@@ -2092,10 +2092,7 @@ void AIPlayerJH::CheckForUnconnectedBuildings()
                 if(construction->IsConnectedToRoadSystem(bld->GetFlag()) == false)
                 {
                     construction->AddConnectFlagJob(bld->GetFlag());
-                } else
-                {
-                    RemoveAllUnusedRoads(bld->GetPos());
-                }
+                } 
                 ++it;
                 if(it == bldList.end()) // wrap around
                     it = bldList.begin();

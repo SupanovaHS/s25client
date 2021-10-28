@@ -36,7 +36,8 @@ public:
 
     const std::list<noBuildingSite*>& GetBuildingSites() const { return building_sites; }
     std::list<noBuildingSite*>& GetBuildingSitesptr()  { return building_sites; }
-    const std::list<nobUsual*>& GetAllBuildings(BuildingType type) const;
+    helpers::EnumArray<std::list<nobUsual*>, BuildingType> GetAllBuildings() const { return buildings; }
+    const std::list<nobUsual*>& GetAllBuildingsType(BuildingType type) const;
     const std::list<nobUsual*>& GetBuildings(BuildingType type) const;
     const std::list<nobMilitary*>& GetMilitaryBuildings() const { return military_buildings; }
     const std::list<nobHarborBuilding*>& GetHarbors() const { return harbors; }

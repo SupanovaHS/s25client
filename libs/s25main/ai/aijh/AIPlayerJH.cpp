@@ -2688,6 +2688,16 @@ void AIPlayerJH::AdjustSettings()
                 toolsettings[Tool::PickAxe] = 6;
             if(inventory[GoodType::Hammer] + inventory[Job::Builder] < 15)
                 toolsettings[Tool::Hammer] = 7;
+            if(inventory[GoodType::Tongs] + inventory[Job::Metalworker] < 2)
+                toolsettings[Tool::Tongs] = 7;
+            if(inventory[GoodType::Crucible] + inventory[Job::IronFounder] < 2)
+                toolsettings[Tool::Crucible] = 7;
+
+            // basic food
+            if(inventory[GoodType::RodAndLine] + inventory[Job::Fisher] < 6)
+                toolsettings[Tool::RodAndLine] = 6;
+            if(inventory[GoodType::Bow] + inventory[Job::Hunter] < 6)
+                toolsettings[Tool::Bow] = 6;
         }
 
         // Only if we haven't ordered any basic tool, we may order other tools

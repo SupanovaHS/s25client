@@ -9,6 +9,8 @@
 #include "buildings/nobBaseWarehouse.h"
 #include "buildings/nobMilitary.h"
 #include "buildings/noBuildingSite.h"
+#include "buildings/nobUsual.h"
+
 
 #include "gameTypes/BuildingType.h"
 #include "gameTypes/GoodTypes.h"
@@ -254,44 +256,118 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
         buildingsWanted[BuildingType::Quarry] = 2u;
         buildingsWanted[BuildingType::Fishery] = 2u;
         buildingsWanted[BuildingType::Hunter] = 2u;
-        buildingsWanted[BuildingType::GraniteMine] = 1u;
-        buildingsWanted[BuildingType::GoldMine] = 1u;
-        buildingsWanted[BuildingType::Mint] = 1u;
         return;
     }
   
     if(militaryPower < 8)
         return;
-    if(coalCount < 3 || ironCount < 2
+    if(coalCount < 2 || ironCount < 2
        || ironsmelterCount < 2  || metalworksCount < 2 )
     {
         buildingsWanted[BuildingType::Fishery] = 3u;
         buildingsWanted[BuildingType::Hunter] = 3u;
-        buildingsWanted[BuildingType::CoalMine] = 3u;
+        buildingsWanted[BuildingType::CoalMine] = 2u;
         buildingsWanted[BuildingType::IronMine] = 2u;
         buildingsWanted[BuildingType::Ironsmelter] = 2u;
         buildingsWanted[BuildingType::Metalworks] = 2u;
-        buildingsWanted[BuildingType::Armory] = 2u;
-        buildingsWanted[BuildingType::Brewery] = 1u;
-        buildingsWanted[BuildingType::GoldMine] = 1u;
-        buildingsWanted[BuildingType::Mint] = 1u;
-        buildingsWanted[BuildingType::Well] = 1u;
         buildingsWanted[BuildingType::Farm] = 1u;
+        buildingsWanted[BuildingType::Charburner] = 1u;
+        buildingsWanted[BuildingType::Armory] = 1u;
+        buildingsWanted[BuildingType::Brewery] = 1u;
         return;
     }
 
+    // when the AI gets to this pint, on Low starting resources, we get into the situation of a severe tool shortage
+    // We need to prioritize iron and coal, and wait form them to be occupied (wait fo tools)
+    // if we carry on at our current speed. we end up with almost 10 mines, but only 2 miners
+
+    // check at lease 2 iron and 2 coal mine are occupied
+    
+    // have to check actual buildings, incase our granite mine used up a miner
+    std::array<BuildingType, 2> bldsToCheck = {
+      {BuildingType::IronMine, BuildingType::CoalMine}};
+
+    for(const auto& buildings : bldsToCheck)
+    {
+        const auto& buildingType = aijh.getAIInterface().GetBuildings(buildings);
+
+        if(buildingType.size() < 2)
+            return; // under 2 definately no worker
+        int wokerCount = 0;
+        for(const auto& building : buildingType)
+        {
+            if(building->HasWorker())
+                wokerCount++;
+            if(wokerCount == 2)
+                break; // good to go
+        }
+        if(wokerCount < 2)
+            return; // lack of workers, return out
+    }
+
+    // check iron and metalworks
+    if(inventory.people[Job::Metalworker] < 2)
+        return;
+    if(inventory.people[Job::IronFounder] < 2)
+        return;
+
+     
+    // time to get some good food production
+    buildingsWanted[BuildingType::GraniteMine] = 1u;
+     buildingsWanted[BuildingType::Quarry] = 3u;
+    buildingsWanted[BuildingType::Fishery] = 6u;
+    buildingsWanted[BuildingType::Hunter] = 6u;
+    buildingsWanted[BuildingType::Farm] = 5u;
+    buildingsWanted[BuildingType::Mill] = 1u;
+    buildingsWanted[BuildingType::Bakery] = 1u;
+    buildingsWanted[BuildingType::PigFarm] = 2u;
+    buildingsWanted[BuildingType::Slaughterhouse] = 2u;
+    buildingsWanted[BuildingType::Well] = 4u;
+    buildingsWanted[BuildingType::Charburner] = 2u;
+
+    // check food has workers, return if not (don't check fisher or hunters)
+    std::array<Job, 3> foodWorkersToCheck = {{Job::Farmer, Job::Butcher, Job::Baker}};
+
+    for(const auto& job : foodWorkersToCheck)
+    {
+        switch (job)
+        {
+            case Job::Farmer:
+                if(inventory.people[job] < 5)
+                    return;
+            case Job::Butcher:
+                if(inventory.people[job] < 2)
+                    return;
+           default:
+                if(inventory.people[job] < 1)
+                    return;
+        }       
+    }
+
+    // now we "should" have a decent amount of food production
+    // get a few more essential buildings
+
+    buildingsWanted[BuildingType::Armory] = 2u;
+    buildingsWanted[BuildingType::GoldMine] = 1u;
+    buildingsWanted[BuildingType::Mint] = 1u;
+    buildingsWanted[BuildingType::CoalMine] = 4u;
+  
+    if(militaryPower < 15u)
+        return;
     if(sawmillCount < 5)
     {
         buildingsWanted[BuildingType::Sawmill] = 5u;
         buildingsWanted[BuildingType::Forester] =
-          std::max(buildingsWanted[BuildingType::Sawmill], GetNumBuildings(BuildingType::Sawmill)); 
-        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 3u;
-        buildingsWanted[BuildingType::Quarry] = 3u;
-        buildingsWanted[BuildingType::Fishery] = 4u;
-        buildingsWanted[BuildingType::Hunter] = 4u;
-        buildingsWanted[BuildingType::GraniteMine] = 1u;
+          std::max(buildingsWanted[BuildingType::Sawmill], GetNumBuildings(BuildingType::Sawmill));
+        buildingsWanted[BuildingType::Woodcutter] = buildingsWanted[BuildingType::Forester] * 2u;
+        buildingsWanted[BuildingType::Quarry] = 5u;
+        buildingsWanted[BuildingType::Fishery] = 8u;
+        buildingsWanted[BuildingType::Hunter] = 8u;
         return;
     }
+
+    if(militaryPower < 20u)
+        return; // ensure some expansion
 
 
     // Unleash the beast
@@ -306,7 +382,7 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
     if(aijh.ggs.GetMaxMilitaryRank() != 0) // max rank is 0 = private / recruit ==> gold is useless!
     {
         buildingsWanted[BuildingType::GoldMine] = militaryPower / 16u;
-        buildingsWanted[BuildingType::Mint] = buildingsWanted[BuildingType::GoldMine];
+        buildingsWanted[BuildingType::Mint] = GetNumBuildings(BuildingType::GoldMine);
     }
 
     buildingsWanted[BuildingType::Ironsmelter] = militaryPower / 12 + 1u;

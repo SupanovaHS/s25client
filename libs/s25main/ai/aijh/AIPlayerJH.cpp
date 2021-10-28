@@ -1055,10 +1055,6 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
                     }
                 }
             }
-                    
-
-                   
-            
 
             break;
         case BuildingType::Hunter:
@@ -1138,7 +1134,7 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
             if(!construction->OtherUsualBuildingInRadius(around, 12,
                                                          BuildingType::Forester)) // check no forester near by
                 foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius,
-                                            100); // large space needed
+                                            85); // large space needed
             break;
         case BuildingType::Catapult:
             foundPos = SimpleFindPosition(around, BUILDING_SIZE[type], searchRadius);

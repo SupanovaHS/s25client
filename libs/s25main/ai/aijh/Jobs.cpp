@@ -184,7 +184,12 @@ void BuildJob::TryToBuild()
                         type = BuildingType::Guardhouse;
                         break;
                     }
-                    default: allowLarger = true; break; // allow larger when enough sawmills
+                    default:
+                    {
+                        type = BuildingType::Guardhouse;
+                        allowLarger = true;
+                        break; // allow larger when enough sawmills
+                    }
                 }
                 if(allowLarger == false) // no need to check when we got enough sawmills
                     if(mine.isValid() && !aijh.getAIInterface().GetBuildings(BuildingType::Sawmill).empty())
@@ -198,7 +203,8 @@ void BuildJob::TryToBuild()
                         if(!aijh.UpgradeBldPos.isValid())
                         {
                             // no upgrade building found, might be early game, force type
-                            const auto& castlesite = aijh.SimpleFindPosition(foundPos, BuildingQuality::Castle,3); // see if we can build a fortress
+                            const auto& castlesite = aijh.SimpleFindPosition(foundPos, BuildingQuality::Castle,
+                                                                             3); // see if we can build a fortress
                             if(castlesite.isValid())
                             {
                                 foundPos = castlesite;

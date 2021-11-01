@@ -1081,7 +1081,7 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
         case BuildingType::Guardhouse:
         case BuildingType::Watchtower:
         case BuildingType::Fortress:
-            foundPos = FindBestPosition(around, AIResource::Borderland, BUILDING_SIZE[type], searchRadius * 2);
+            foundPos = FindBestPosition(around, AIResource::Borderland, BUILDING_SIZE[type], searchRadius);
             break;
         case BuildingType::GoldMine:
             foundPos = FindBestPosition(around, AIResource::Gold, BuildingQuality::Mine, searchRadius);
@@ -1126,7 +1126,7 @@ MapPoint AIPlayerJH::FindPositionForBuildingAround(BuildingType type, const MapP
         case BuildingType::Farm:
             if(!construction->OtherUsualBuildingInRadius(around, 12,
                                                          BuildingType::Forester)) // check no forester near by
-                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);
+                foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 65);
             /*if(foundPos.isValid())
                 foundPos = FindBestPosition(around, AIResource::Plantspace, BUILDING_SIZE[type], searchRadius, 85);*/
             break;

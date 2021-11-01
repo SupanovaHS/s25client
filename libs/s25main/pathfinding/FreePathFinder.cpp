@@ -167,13 +167,13 @@ bool FreePathFinder::FindPathAlternatingConditions(const MapPoint start, const M
 
         // LOG.write(("pf get neighbor nodes %i, %i id: %i \n", best.x, best.y, best_id);
         // Knoten in alle 6 Richtungen bilden
-        for(const auto dir : helpers::enumRange(startDir))
+        for(const auto& dir : helpers::enumRange(startDir))
         {
             // Form coordinates of the corresponding surrounding point
-            MapPoint neighbourPos = gwb_.GetNeighbour(nodes[bestId].mapPt, dir);
+            const MapPoint& neighbourPos = gwb_.GetNeighbour(nodes[bestId].mapPt, dir);
 
             // Form the ID of the surrounding node
-            unsigned nbId = gwb_.GetIdx(neighbourPos);
+           const unsigned& nbId = gwb_.GetIdx(neighbourPos);
 
             // Knot already formed in the field?
             if((prevStepEven && nodes[nbId].lastVisited == currentVisit)
@@ -201,7 +201,7 @@ bool FreePathFinder::FindPathAlternatingConditions(const MapPoint start, const M
                     for(unsigned i = nodes[bestId].way - 1; i > 1;
                         i--) // backtrack the plannend route and check if another "even" position is too close
                     {
-                        Direction pdir = alternate ? nodes[back_id].dirEven : nodes[back_id].dir;
+                        const Direction& pdir = alternate ? nodes[back_id].dirEven : nodes[back_id].dir;
                         p = gwb_.GetNeighbour(p, pdir + 3u);
                         if(i % 2 == 0) // even step
                         {

@@ -53,7 +53,7 @@ bool FreePathFinder::FindPath(const MapPoint start, const MapPoint dest, bool ra
     FreePathNode& startNode = fpNodes[startId];
     FreePathNode& destNode = fpNodes[destId];
 
-    // Anfangsknoten einfügen Und mit entsprechenden Werten füllen
+   // Insert start node and fill with appropriate values
     startNode.targetDistance = gwb_.CalcDistance(start, dest);
     startNode.estimatedDistance = startNode.targetDistance;
     startNode.lastVisited = currentVisit;
@@ -61,29 +61,28 @@ bool FreePathFinder::FindPath(const MapPoint start, const MapPoint dest, bool ra
     startNode.curDistance = 0;
 
     todo.push(&startNode);
-
-    // Bei Zufälliger Richtung anfangen (damit man nicht immer denselben Weg geht, besonders für die Soldaten wichtig)
+    // Start with a random direction (so that you don't always go the same way, especially important for the soldiers)
     // TODO confirm random: RANDOM.Rand(__FILE__, __LINE__, y_start * GetWidth() + x_start, 6);
     const Direction startDir =
       randomRoute ? convertToDirection(gwb_.GetIdx(start) * gwb_.GetEvMgr().GetCurrentGF()) : Direction::West;
 
     while(!todo.empty())
     {
-        // Knoten mit den geringsten Wegkosten auswählen
+        // Select nodes with the lowest travel costs
         FreePathNode& best = *todo.pop();
 
-        // Ziel schon erreicht?
+        // Have you already reached your goal?
         if(&best == &destNode)
         {
-            // Ziel erreicht!
-            // Jeweils die einzelnen Angaben zurückgeben, falls gewünscht (Pointer übergeben)
+            // Goal achieved !
+            // Return the individual information in each case, if desired (pass pointer)
             if(length)
                 *length = best.curDistance;
             if(route)
                 route->resize(best.curDistance);
 
             FreePathNode* curNode = &best;
-            // Route rekonstruieren und ggf. die erste Richtung speichern, falls gewünscht
+            // Reconstruct the route and, if necessary, save the first direction, if desired
             for(unsigned z = best.curDistance; z > 0; --z)
             {
                 if(route)
@@ -95,22 +94,23 @@ bool FreePathFinder::FindPath(const MapPoint start, const MapPoint dest, bool ra
 
             RTTR_Assert(curNode == &startNode);
 
-            // Fertig, es wurde ein Pfad gefunden
+            // Done, a path was found
             return true;
         }
 
-        // Maximaler Weg schon erreicht? In dem Fall brauchen wir keine weiteren Knoten von diesem aus bilden
+        // Has the maximum distance already been reached? In that case we don't need to create any further nodes from
+        // this one
         if(best.curDistance >= maxLength)
             continue;
 
-        // Knoten in alle 6 Richtungen bilden
+        // Make nodes in all 6 directions
         const auto neighbors = gwb_.GetNeighbours(best.mapPt);
         for(const Direction dir : helpers::enumRange(startDir))
         {
-            // Koordinaten des entsprechenden umliegenden Punktes bilden
+            // Form coordinates of the corresponding surrounding point
             MapPoint neighbourPos = neighbors[dir];
 
-            // ID des umliegenden Knotens bilden
+            // Form the ID of the surrounding node
             unsigned nbId = gwb_.GetIdx(neighbourPos);
             FreePathNode& neighbour = fpNodes[nbId];
 
@@ -118,10 +118,10 @@ bool FreePathFinder::FindPath(const MapPoint start, const MapPoint dest, bool ra
             if(best.prev == &neighbour)
                 continue;
 
-            // Knoten schon auf dem Feld gebildet?
+            // Node already formed in the field?
             if(neighbour.lastVisited == currentVisit)
             {
-                // Dann nur ggf. Weg und Vorgänger korrigieren, falls der Weg kürzer ist
+                // Then only correct route and predecessor if necessary, if the route is shorter
                 if(best.curDistance + 1 < neighbour.curDistance)
                 {
                     // Check if we can use this transition
@@ -147,7 +147,7 @@ bool FreePathFinder::FindPath(const MapPoint start, const MapPoint dest, bool ra
                 if(!nodeChecker.IsEdgeOk(best.mapPt, dir))
                     continue;
 
-                // Alles in Ordnung, Knoten kann gebildet werden
+                // Everything is OK, the knot can be formed
                 neighbour.lastVisited = currentVisit;
                 neighbour.curDistance = best.curDistance + 1;
                 neighbour.targetDistance = gwb_.CalcDistance(neighbourPos, dest);

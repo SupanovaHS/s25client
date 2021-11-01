@@ -244,9 +244,6 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
         return;
     }
 
-    if(militaryPower < 4)
-        return;
-    
     if(sawmillCount < 3)
     {
         buildingsWanted[BuildingType::Sawmill] = 3u;
@@ -269,11 +266,12 @@ void BuildingPlanner::UpdateBuildingsWanted(const AIPlayerJH& aijh)
         buildingsWanted[BuildingType::CoalMine] = 2u;
         buildingsWanted[BuildingType::IronMine] = 2u;
         buildingsWanted[BuildingType::Ironsmelter] = 2u;
-        buildingsWanted[BuildingType::Metalworks] = 2u;
+        buildingsWanted[BuildingType::Metalworks] = 2u; 
         buildingsWanted[BuildingType::Farm] = 1u;
         buildingsWanted[BuildingType::Charburner] = 1u;
         buildingsWanted[BuildingType::Armory] = 1u;
         buildingsWanted[BuildingType::Brewery] = 1u;
+        buildingsWanted[BuildingType::Well] = 1u;
         return;
     }
 

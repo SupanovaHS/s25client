@@ -121,8 +121,8 @@ void BuildJob::TryToBuild()
         }
         if(BuildingProperties::IsMilitary(type))
         {
-            AIInterface& aiInterface = aijh.GetInterface();
-            if(aiInterface.GetMilitaryBuildings().size() > 45) // allow some expansion before capping to encourage soldier upgrades
+            if(aiInterface.GetMilitaryBuildings().size()
+               > 30) // allow some expansion before capping to encourage soldier upgrades
             {
                 // now count up how many soldiers we have in reserve (sat in storehouses) and only allow if we have
                 // spare Generals The idea here is to slow down expansion allowing time for soldiers to be upgraded
@@ -135,16 +135,16 @@ void BuildJob::TryToBuild()
                         generalCount += sh->GetInventory().people[Job::General];
                     }
 
-
-                    // now add up our building sites and deduct the total from general count to ensure we don't spam out 50 military buildings in one hit
-                    for( const auto& bldSite : aiInterface.GetBuildingSites())
+                    // now add up our building sites and deduct the total from general count to ensure we don't spam out
+                    // 50 military buildings in one hit
+                    for(const auto& bldSite : aiInterface.GetBuildingSites())
                     {
                         if(BuildingProperties::IsMilitary(bldSite->GetBuildingType()))
                         {
                             --generalCount; // reserve a soldier
                         }
                     }
-                    
+
                     if(generalCount < 30) // keep a reserve for enemy expansion and attacks
                     {
                         state = JobState::Failed;
@@ -157,7 +157,6 @@ void BuildJob::TryToBuild()
             {
                 // could we build a bigger military building? check if the location is surrounded by terrain that does
                 // not allow normal buildings (probably important map part)
-               
 
                 // if we near a mountain , allow larger
                 const auto& mine =

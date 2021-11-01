@@ -176,7 +176,7 @@ MapPoint AIResourceMap::findBestPositionRanged(const MapPoint& pt, BuildingQuali
 
 void AIResourceMap::avoidPosition(const MapPoint& pt)
 {
-    map[pt] = 0;
+    map[pt] = -40;
 }
 
 void AIResourceMap::updateAroundDiminishable(const MapPoint& pt, const int radius)

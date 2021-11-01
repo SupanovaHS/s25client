@@ -97,6 +97,28 @@ void BuildJob::TryToBuild()
     if(searchMode == SearchMode::Radius)
     {
         foundPos = aijh.FindPositionForBuildingAround(type, around);
+
+        AIInterface& aiInterface = aijh.GetInterface();
+
+        // check if we should be placing a military build near border first
+        if(foundPos.isValid() && !aijh.getAIInterface().GetBuildings(BuildingType::Sawmill).empty())
+        {
+            if(!aijh.GetWorld().IsMilitaryBuildingNearNode(foundPos, aijh.GetPlayerId()))
+            {
+                // are we placing near border?
+
+                const auto& pts = aijh.GetInterface().gwb.GetPointsInRadiusWithCenter(foundPos, 2);
+
+                for(const auto& point : pts)
+                {
+                    if(aijh.GetInterface().IsBorder(point))
+                    {
+                        type = BuildingType::Barracks;
+                        break;
+                    }
+                }
+            }
+        }
         if(BuildingProperties::IsMilitary(type))
         {
             AIInterface& aiInterface = aijh.GetInterface();

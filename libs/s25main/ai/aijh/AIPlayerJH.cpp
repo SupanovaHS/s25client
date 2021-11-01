@@ -2087,7 +2087,7 @@ void AIPlayerJH::CheckForUnconnectedBuildings()
             std::advance(it, randombld);
             auto bld = (*it);
 
-            for(int i=0;i < 10;++i)
+            for(int i=0;i < 3;++i)
             {
                 if(construction->IsConnectedToRoadSystem(bld->GetFlag()) == false)
                 {
